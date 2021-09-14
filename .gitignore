@@ -1,0 +1,5 @@
+.DS_Store
+*/.DS_Store
+.DS_Store
+data/
+baselines/method1/snap/pretrained/model_LXRT.pth
