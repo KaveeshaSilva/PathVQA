@@ -263,7 +263,7 @@ if __name__ == '__main__':
     optimizer = optim.SGD(net.parameters(), lr=0.001, momentum=0.9)
 
     EPOCH = 5
-    PATH = "model000.pt"
+    PATH = "/content/drive/My Drive/model000.pt"
     LOSS = 0.4
 
     torch.save({
