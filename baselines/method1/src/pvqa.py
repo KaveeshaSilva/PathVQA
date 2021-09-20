@@ -16,7 +16,7 @@ from pretrain.qa_answer_table import load_lxmert_qa
 from tasks.pvqa_model import PVQAModel
 from tasks.pvqa_data import PVQADataset, PVQATorchDataset, PVQAEvaluator
 baseUrl = 'drive/MyDrive/PathVQA'
-checkpoint_dir = "/content/drive/My Drive/modelnew.pt"
+checkpoint_dir = "modelnew.pt"
 
 # default `log_dir` is "runs" - we'll be more specific here
 writer = SummaryWriter('runs/fashion_mnist_experiment_1')
