@@ -16,7 +16,7 @@ from pretrain.qa_answer_table import load_lxmert_qa
 from tasks.pvqa_model import PVQAModel
 from tasks.pvqa_data import PVQADataset, PVQATorchDataset, PVQAEvaluator
 baseUrl = 'drive/MyDrive/PathVQA'
-checkpoint_dir = baseUrl + "/checkpoint"
+checkpoint_dir = baseUrl + "/checkpoint/point.pth.tar"
 
 # default `log_dir` is "runs" - we'll be more specific here
 writer = SummaryWriter('runs/fashion_mnist_experiment_1')
@@ -90,8 +90,7 @@ class PVQA:
 
         best_valid = 0.
         lastEpoch = -1  # self.getLastEpoch()
-        running_loss = lastEpoch + 1  # new
-        start_epoch = 3
+        start_epoch = lastEpoch + 1  # new
 
         print('jijijijijij')
         for epoch in range(start_epoch, args.epochs):
