@@ -18,7 +18,7 @@ from tasks.pvqa_data import PVQADataset, PVQATorchDataset, PVQAEvaluator
 baseUrl = 'drive/MyDrive/PathVQA'
 checkpoint_dir = baseUrl+"/checkpoint.pth"
 
-startFrom = 'M'  # M - middle ,   B - beginning
+startFrom = 'B'  # M - middle ,   B - beginning
 
 # default `log_dir` is "runs" - we'll be more specific here
 writer = SummaryWriter('runs/fashion_mnist_experiment_1')
@@ -111,20 +111,34 @@ class PVQA:
             print("Start new epoch - epoch number : "+str(epoch))
             quesid2ans = {}
             for i, (ques_id, feats, boxes, sent, target) in iter_wrapper(enumerate(loader)):
-
+                print('check 1')
                 self.model.train()
+                print('check 2')
+
                 self.optim.zero_grad()
+                print('check 3')
 
                 feats, boxes, target = feats.cuda(), boxes.cuda(), target.cuda()
+                print('check 4')
+
                 logit = self.model(feats, boxes, sent)
+                print('check 5')
+
                 assert logit.dim() == target.dim() == 2
+                print('check 6')
+
                 loss = self.bce_loss(logit, target)
+                print('check 7')
+
                 loss = loss * logit.size(1)
+                print('check 8')
 
                 loss.backward()
+                print('check 9')
 
                 # /////////////////////////////////////////// #new
                 running_loss += loss.item()
+                print('check 10')
 
                 if i % 100 == 99:    # every 1000 mini-batches...
 
