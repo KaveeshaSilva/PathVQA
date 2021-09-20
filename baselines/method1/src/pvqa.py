@@ -263,7 +263,7 @@ if __name__ == '__main__':
     optimizer = optim.SGD(net.parameters(), lr=0.001, momentum=0.9)
 
     EPOCH = 5
-    PATH = "model.pt"
+    PATH = "model000.pt"
     LOSS = 0.4
 
     torch.save({
@@ -272,6 +272,8 @@ if __name__ == '__main__':
         'optimizer_state_dict': optimizer.state_dict(),
         'loss': LOSS,
     }, PATH)
+
+    print('saveddddd  test model')
 
     pvqa = PVQA()
     print('first')
