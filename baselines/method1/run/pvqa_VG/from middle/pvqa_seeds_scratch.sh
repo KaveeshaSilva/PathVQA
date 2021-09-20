@@ -16,7 +16,7 @@ do
       python ${baseUrl}/baselines/method1/src/pvqa.py \
       --train train --valid val  \
       --llayers 9 --xlayers 5 --rlayers 5 \
-      --loadLXMERT ${baseUrl}/baselines/method1/snap/pretrained/model \
+      --load ${ft_output}/BEST \
       --batchSize 32 --optim bert --lr 5e-5 --epochs 120 \
       --seed $seed --pvqaimgv $imgv \
       --tqdm --output $ft_output

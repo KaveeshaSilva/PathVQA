@@ -1,3 +1,7 @@
+from logging import NullHandler
+import re
+from tarfile import NUL
+from torch.utils.tensorboard import SummaryWriter
 import os
 import collections
 
@@ -11,8 +15,8 @@ from param import args
 from pretrain.qa_answer_table import load_lxmert_qa
 from tasks.pvqa_model import PVQAModel
 from tasks.pvqa_data import PVQADataset, PVQATorchDataset, PVQAEvaluator
-
-from torch.utils.tensorboard import SummaryWriter
+baseUrl = 'drive/MyDrive/PathVQA'
+checkpoint_dir = baseUrl + "/checkpoint"
 
 # default `log_dir` is "runs" - we'll be more specific here
 writer = SummaryWriter('runs/fashion_mnist_experiment_1')
@@ -85,10 +89,13 @@ class PVQA:
                         ) if args.tqdm else (lambda x: x)
 
         best_valid = 0.
-        running_loss = 0  # new
+        lastEpoch = self.getLastEpoch()
+        running_loss = lastEpoch + 1  # new
         start_epoch = 3
+
         print('jijijijijij')
         for epoch in range(start_epoch, args.epochs):
+            print("Start new epoch - epoch number : "+str(epoch))
             quesid2ans = {}
             for i, (ques_id, feats, boxes, sent, target) in iter_wrapper(enumerate(loader)):
 
@@ -132,7 +139,9 @@ class PVQA:
                 if valid_score > best_valid:
                     best_valid = valid_score
                     print('saveddddddddddddddddddd')
-                    self.save("BEST")
+
+                    # self.save("BEST")
+                    self.newSave(epoch, loss)
 
                 log_str += "Epoch- %d: Valid %0.2f\n" % (epoch, valid_score * 100.) + \
                            "Epoch- %d: Best %0.2f\n" % (
@@ -201,6 +210,30 @@ class PVQA:
         state_dict = torch.load("%s.pth" % path)
         self.model.load_state_dict(state_dict)
 
+    def newLoadModel(self):
+        PATH = checkpoint_dir
+        checkpoint = torch.load(PATH)
+        self.model.load_state_dict(checkpoint['model_state_dict'])
+        self.optim.load_state_dict(checkpoint['optimizer_state_dict'])
+
+    def getLastEpoch(self):
+        PATH = checkpoint_dir
+        checkpoint = torch.load(PATH)
+        epoch = checkpoint['epoch']
+        if(epoch == NUL or epoch == NullHandler or epoch == ''):
+            return -1
+        else:
+            return epoch
+
+    def newSave(self, EPOCH, LOSS):
+        PATH = checkpoint_dir
+        torch.save({
+            'epoch': EPOCH,
+            'model_state_dict': self.model.state_dict(),
+            'optimizer_state_dict': self.optim.state_dict(),
+            'loss': LOSS,
+        }, PATH)
+
 
 if __name__ == '__main__':
     pvqa = PVQA()
@@ -208,7 +241,8 @@ if __name__ == '__main__':
     # Load VQA model weights
     # Note: It is different from loading LXMERT pre-trained weights.
     if args.load is not None:
-        pvqa.load(args.load)
+        # pvqa.load(args.load)
+        pvqa.newLoadModel()
         print('second')
     else:
         print('third')
