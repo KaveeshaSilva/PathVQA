@@ -89,7 +89,7 @@ class PVQA:
                         ) if args.tqdm else (lambda x: x)
 
         best_valid = 0.
-        lastEpoch = self.getLastEpoch()
+        lastEpoch = -1  # self.getLastEpoch()
         running_loss = lastEpoch + 1  # new
         start_epoch = 3
 
