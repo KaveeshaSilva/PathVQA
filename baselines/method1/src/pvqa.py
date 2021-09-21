@@ -106,6 +106,11 @@ class PVQA:
 
         start_epoch = lastEpoch + 1  # new
 
+        ######################################################## new to add model graph to tensorboard
+        # dataiter = enumerate(loader)
+        # ques_id, feats, boxes, sent, target = dataiter.next()
+        # writer.add_graph(self.model, (feats, boxes, sent))
+        ####################################################
         print('start running epochs')
         for epoch in range(start_epoch, args.epochs):
             print("Start new epoch - epoch number : "+str(epoch))
@@ -148,6 +153,12 @@ class PVQA:
                                       epoch * len(loader) + i)
                     running_loss = 0
 
+                    # ...log the validation loss
+                    if self.valid_tuple is not None:
+                        valid_score = self.evaluate(eval_tuple)
+                        writer.add_scalar('validation loss',
+                                        valid_score,
+                                        epoch * len(loader) + i)
                 # //////////////////////////////////////////
 
                 nn.utils.clip_grad_norm_(self.model.parameters(), 5.)
