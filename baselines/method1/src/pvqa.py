@@ -18,7 +18,7 @@ from tasks.pvqa_data import PVQADataset, PVQATorchDataset, PVQAEvaluator
 baseUrl = 'drive/MyDrive/PathVQA'
 checkpoint_dir = baseUrl+"/checkpoint.pth"
 
-startFrom = 'B'  # M - middle ,   B - beginning
+startFrom = 'M'  # M - middle ,   B - beginning
 
 # default `log_dir` is "runs" - we'll be more specific here
 writer = SummaryWriter('runs/fashion_mnist_experiment_1')
@@ -61,8 +61,10 @@ class PVQA:
         if args.load_lxmert is not None:
             print('bbbbbbbbbbbbbbbbbbbbbbbbbbbbb')
             print(args.load_lxmert)
-
-            self.model.lxrt_encoder.load(args.load_lxmert)
+            if(startFrom == 'B'):
+                self.model.lxrt_encoder.load(args.load_lxmert)
+            else:
+                self.model.lxrt_encoder.load(baseUrl+"/checkpoint.pth")
         if args.load_lxmert_qa is not None:
             print('cccccccccccccccccccccccccccccc')
             print(args.load_lxmert_qa)
