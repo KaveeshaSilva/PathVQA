@@ -18,8 +18,9 @@ from tasks.pvqa_data import PVQADataset, PVQATorchDataset, PVQAEvaluator
 baseUrl = 'drive/MyDrive/PathVQA'
 checkpoint_dir = baseUrl+"/checkpoint_LXRT.pth"
 load_dir = baseUrl+"/checkpoint"
+temp_checkpoint_save_dir = baseUrl+"/checkpointtemp_LXRT.pth"
 
-startFrom = 'B'  # M - middle ,   B - beginning
+startFrom = 'M'  # M - middle ,   B - beginning
 
 # default `log_dir` is "runs" - we'll be more specific here
 writer = SummaryWriter('runs/fashion_mnist_experiment_1')
@@ -259,7 +260,8 @@ class PVQA:
         return checkpoint
 
     def newSave(self, EPOCH, LOSS):
-        PATH = checkpoint_dir
+        # PATH = checkpoint_dir
+        PATH = temp_checkpoint_save_dir
         torch.save({
             'epoch': EPOCH,
             'model_state_dict': self.model.state_dict(),
