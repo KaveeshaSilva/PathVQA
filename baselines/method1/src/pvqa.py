@@ -16,7 +16,8 @@ from pretrain.qa_answer_table import load_lxmert_qa
 from tasks.pvqa_model import PVQAModel
 from tasks.pvqa_data import PVQADataset, PVQATorchDataset, PVQAEvaluator
 baseUrl = 'drive/MyDrive/PathVQA'
-checkpoint_dir = baseUrl+"/checkpoint.pth"
+checkpoint_dir = baseUrl+"/checkpoint_LXRT.pth"
+load_dir = baseUrl+"/checkpoint"
 
 startFrom = 'M'  # M - middle ,   B - beginning
 
@@ -64,7 +65,7 @@ class PVQA:
             if(startFrom == 'B'):
                 self.model.lxrt_encoder.load(args.load_lxmert)
             else:
-                self.model.lxrt_encoder.load(baseUrl+"/checkpoint.pth")
+                self.model.lxrt_encoder.load(load_dir)
         if args.load_lxmert_qa is not None:
             print('cccccccccccccccccccccccccccccc')
             print(args.load_lxmert_qa)
