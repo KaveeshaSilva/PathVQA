@@ -56,10 +56,17 @@ class PVQA:
         # Model
         self.model = PVQAModel(self.train_tuple.dataset.num_answers)
 
+        print('aaaaaaaaaaaaaaaaaaaaaaaaaaaa')
         # Load pre-trained weights
         if args.load_lxmert is not None:
+            print('bbbbbbbbbbbbbbbbbbbbbbbbbbbbb')
+            print(args.load_lxmert)
+
             self.model.lxrt_encoder.load(args.load_lxmert)
         if args.load_lxmert_qa is not None:
+            print('cccccccccccccccccccccccccccccc')
+            print(args.load_lxmert_qa)
+
             load_lxmert_qa(args.load_lxmert_qa, self.model,
                            label2ans=self.train_tuple.dataset.label2ans)
         # GPU options
@@ -106,7 +113,7 @@ class PVQA:
 
         start_epoch = lastEpoch + 1  # new
 
-        ######################################################## new to add model graph to tensorboard
+        # new to add model graph to tensorboard
         # dataiter = enumerate(loader)
         # ques_id, feats, boxes, sent, target = dataiter.next()
         # writer.add_graph(self.model, (feats, boxes, sent))
@@ -116,34 +123,24 @@ class PVQA:
             print("Start new epoch - epoch number : "+str(epoch))
             quesid2ans = {}
             for i, (ques_id, feats, boxes, sent, target) in iter_wrapper(enumerate(loader)):
-                print('check 1')
                 self.model.train()
-                print('check 2')
 
                 self.optim.zero_grad()
-                print('check 3')
 
                 feats, boxes, target = feats.cuda(), boxes.cuda(), target.cuda()
-                print('check 4')
 
                 logit = self.model(feats, boxes, sent)
-                print('check 5')
 
                 assert logit.dim() == target.dim() == 2
-                print('check 6')
 
                 loss = self.bce_loss(logit, target)
-                print('check 7')
 
                 loss = loss * logit.size(1)
-                print('check 8')
 
                 loss.backward()
-                print('check 9')
 
                 # /////////////////////////////////////////// #new
                 running_loss += loss.item()
-                print('check 10')
 
                 if i % 100 == 99:    # every 1000 mini-batches...
 
@@ -157,8 +154,8 @@ class PVQA:
                     if self.valid_tuple is not None:
                         valid_score = self.evaluate(eval_tuple)
                         writer.add_scalar('validation loss',
-                                        valid_score,
-                                        epoch * len(loader) + i)
+                                          valid_score,
+                                          epoch * len(loader) + i)
                 # //////////////////////////////////////////
 
                 nn.utils.clip_grad_norm_(self.model.parameters(), 5.)
