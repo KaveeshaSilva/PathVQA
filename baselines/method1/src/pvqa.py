@@ -20,10 +20,10 @@ checkpoint_dir = baseUrl+"/checkpoint_LXRT.pth"
 load_dir = baseUrl+"/checkpoint"
 temp_checkpoint_save_dir = baseUrl+"/checkpointtemp_LXRT.pth"
 
-startFrom = 'M'  # M - middle ,   B - beginning
+startFrom = 'B'  # M - middle ,   B - beginning
 
 # default `log_dir` is "runs" - we'll be more specific here
-writer = SummaryWriter('runs/fashion_mnist_experiment_1')
+writer = SummaryWriter(baseUrl+'runs/Pathvqa_experiment_1')
 
 DataTuple = collections.namedtuple("DataTuple", 'dataset loader evaluator')
 valid_bs = 256
@@ -58,17 +58,14 @@ class PVQA:
         # Model
         self.model = PVQAModel(self.train_tuple.dataset.num_answers)
 
-        print('aaaaaaaaaaaaaaaaaaaaaaaaaaaa')
         # Load pre-trained weights
         if args.load_lxmert is not None:
-            print('bbbbbbbbbbbbbbbbbbbbbbbbbbbbb')
             print(args.load_lxmert)
             if(startFrom == 'B'):
                 self.model.lxrt_encoder.load(args.load_lxmert)
             # else:
             #     self.model.lxrt_encoder.load(load_dir)
         if args.load_lxmert_qa is not None:
-            print('cccccccccccccccccccccccccccccc')
             print(args.load_lxmert_qa)
 
             load_lxmert_qa(args.load_lxmert_qa, self.model,
@@ -178,7 +175,7 @@ class PVQA:
                 if valid_score > best_valid:
                     best_valid = valid_score
                     print('model checkpoint saved  epoch:'+str(epoch))
-                    # self.save("BEST")
+                    self.save("BEST")
                     self.newSave(epoch, running_loss)
 
                 log_str += "Epoch- %d: Valid %0.2f\n" % (epoch, valid_score * 100.) + \
