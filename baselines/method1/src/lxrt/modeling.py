@@ -262,9 +262,12 @@ class BertEmbeddings(nn.Module):
 
     def __init__(self, config):
         super(BertEmbeddings, self).__init__()
-        self.word_embeddings = nn.Embedding(config.vocab_size, config.hidden_size, padding_idx=0)
-        self.position_embeddings = nn.Embedding(config.max_position_embeddings, config.hidden_size, padding_idx=0)
-        self.token_type_embeddings = nn.Embedding(config.type_vocab_size, config.hidden_size, padding_idx=0)
+        self.word_embeddings = nn.Embedding(
+            config.vocab_size, config.hidden_size, padding_idx=0)
+        self.position_embeddings = nn.Embedding(
+            config.max_position_embeddings, config.hidden_size, padding_idx=0)
+        self.token_type_embeddings = nn.Embedding(
+            config.type_vocab_size, config.hidden_size, padding_idx=0)
 
         # self.LayerNorm is not snake-cased to stick with TensorFlow model variable name and be able to load
         # any TensorFlow checkpoint file
@@ -273,7 +276,8 @@ class BertEmbeddings(nn.Module):
 
     def forward(self, input_ids, token_type_ids=None):
         seq_length = input_ids.size(1)
-        position_ids = torch.arange(seq_length, dtype=torch.long, device=input_ids.device)
+        position_ids = torch.arange(
+            seq_length, dtype=torch.long, device=input_ids.device)
         position_ids = position_ids.unsqueeze(0).expand_as(input_ids)
         if token_type_ids is None:
             token_type_ids = torch.zeros_like(input_ids)
@@ -296,7 +300,8 @@ class BertAttention(nn.Module):
                 "The hidden size (%d) is not a multiple of the number of attention "
                 "heads (%d)" % (config.hidden_size, config.num_attention_heads))
         self.num_attention_heads = config.num_attention_heads
-        self.attention_head_size = int(config.hidden_size / config.num_attention_heads)
+        self.attention_head_size = int(
+            config.hidden_size / config.num_attention_heads)
         self.all_head_size = self.num_attention_heads * self.attention_head_size
 
         # visual_dim = 2048
@@ -309,7 +314,8 @@ class BertAttention(nn.Module):
         self.dropout = nn.Dropout(config.attention_probs_dropout_prob)
 
     def transpose_for_scores(self, x):
-        new_x_shape = x.size()[:-1] + (self.num_attention_heads, self.attention_head_size)
+        new_x_shape = x.size()[
+            :-1] + (self.num_attention_heads, self.attention_head_size)
         x = x.view(*new_x_shape)
         return x.permute(0, 2, 1, 3)
 
@@ -323,8 +329,10 @@ class BertAttention(nn.Module):
         value_layer = self.transpose_for_scores(mixed_value_layer)
 
         # Take the dot product between "query" and "key" to get the raw attention scores.
-        attention_scores = torch.matmul(query_layer, key_layer.transpose(-1, -2))
-        attention_scores = attention_scores / math.sqrt(self.attention_head_size)
+        attention_scores = torch.matmul(
+            query_layer, key_layer.transpose(-1, -2))
+        attention_scores = attention_scores / \
+            math.sqrt(self.attention_head_size)
         # Apply the attention mask is (precomputed for all layers in BertModel forward() function)
         if attention_mask is not None:
             attention_scores = attention_scores + attention_mask
@@ -338,7 +346,8 @@ class BertAttention(nn.Module):
 
         context_layer = torch.matmul(attention_probs, value_layer)
         context_layer = context_layer.permute(0, 2, 1, 3).contiguous()
-        new_context_layer_shape = context_layer.size()[:-2] + (self.all_head_size,)
+        new_context_layer_shape = context_layer.size()[
+            :-2] + (self.all_head_size,)
         context_layer = context_layer.view(*new_context_layer_shape)
         return context_layer
 
@@ -450,8 +459,10 @@ class LXRTXLayer(nn.Module):
 
     def cross_att(self, lang_input, lang_attention_mask, visn_input, visn_attention_mask):
         # Cross Attention
-        lang_att_output = self.visual_attention(lang_input, visn_input, ctx_att_mask=visn_attention_mask)
-        visn_att_output = self.visual_attention(visn_input, lang_input, ctx_att_mask=lang_attention_mask)
+        lang_att_output = self.visual_attention(
+            lang_input, visn_input, ctx_att_mask=visn_attention_mask)
+        visn_att_output = self.visual_attention(
+            visn_input, lang_input, ctx_att_mask=lang_attention_mask)
         return lang_att_output, visn_att_output
 
     def self_att(self, lang_input, lang_attention_mask, visn_input, visn_attention_mask):
@@ -479,7 +490,8 @@ class LXRTXLayer(nn.Module):
                                                           visn_att_output, visn_attention_mask)
         lang_att_output, visn_att_output = self.self_att(lang_att_output, lang_attention_mask,
                                                          visn_att_output, visn_attention_mask)
-        lang_output, visn_output = self.output_fc(lang_att_output, visn_att_output)
+        lang_output, visn_output = self.output_fc(
+            lang_att_output, visn_att_output)
 
         return lang_output, visn_output
 
@@ -620,7 +632,8 @@ class BertLMPredictionHead(nn.Module):
                                  bert_model_embedding_weights.size(0),
                                  bias=False)
         self.decoder.weight = bert_model_embedding_weights
-        self.bias = nn.Parameter(torch.zeros(bert_model_embedding_weights.size(0)))
+        self.bias = nn.Parameter(torch.zeros(
+            bert_model_embedding_weights.size(0)))
 
     def forward(self, hidden_states):
         hidden_states = self.transform(hidden_states)
@@ -657,7 +670,8 @@ class BertVisualObjHead(nn.Module):
         # The output weights are the same as the input embeddings, but there is
         # an output-only bias for each token.
         self.decoder_dict = nn.ModuleDict({
-            key: nn.Linear(config.hidden_size, VISUAL_CONFIG.visual_loss_config[key][0])
+            key: nn.Linear(config.hidden_size,
+                           VISUAL_CONFIG.visual_loss_config[key][0])
             for key in self.visual_losses
         })
 
@@ -672,7 +686,8 @@ class BertVisualObjHead(nn.Module):
 class BertPreTrainingHeads(nn.Module):
     def __init__(self, config, bert_model_embedding_weights):
         super(BertPreTrainingHeads, self).__init__()
-        self.predictions = BertLMPredictionHead(config, bert_model_embedding_weights)
+        self.predictions = BertLMPredictionHead(
+            config, bert_model_embedding_weights)
         self.seq_relationship = nn.Linear(config.hidden_size, 2)
 
     def forward(self, sequence_output, pooled_output):
@@ -733,7 +748,8 @@ class BertPreTrainedModel(nn.Module):
         if isinstance(module, (nn.Linear, nn.Embedding)):
             # Slightly different from the TF version which uses truncated_normal for initialization
             # cf https://github.com/pytorch/pytorch/pull/5617
-            module.weight.data.normal_(mean=0.0, std=self.config.initializer_range)
+            module.weight.data.normal_(
+                mean=0.0, std=self.config.initializer_range)
         elif isinstance(module, BertLayerNorm):
             module.bias.data.zero_()
             module.weight.data.fill_(1.0)
@@ -775,14 +791,16 @@ class BertPreTrainedModel(nn.Module):
             archive_file = pretrained_model_name_or_path
         # redirect to the cache, if necessary
         try:
-            resolved_archive_file = cached_path(archive_file, cache_dir=cache_dir)
+            resolved_archive_file = cached_path(
+                archive_file, cache_dir=cache_dir)
         except EnvironmentError:
             if pretrained_model_name_or_path == 'bert-base-uncased':
                 try:
                     print("The BERT-weight-downloading query to AWS was time-out;"
                           "trying to download from UNC servers")
                     archive_file = "https://nlp1.cs.unc.edu/data/bert/bert-base-uncased.tar.gz"
-                    resolved_archive_file = cached_path(archive_file, cache_dir=cache_dir)
+                    resolved_archive_file = cached_path(
+                        archive_file, cache_dir=cache_dir)
                 except EnvironmentError:
                     print("The weight-downloading still crashed with link: %s, "
                           "please check your network connection" % archive_file)
@@ -819,7 +837,8 @@ class BertPreTrainedModel(nn.Module):
         model = cls(config, *inputs, **kwargs)
         if state_dict is None and not from_tf:
             weights_path = os.path.join(serialization_dir, WEIGHTS_NAME)
-            state_dict = torch.load(weights_path, map_location='cpu' if not torch.cuda.is_available() else None)
+            state_dict = torch.load(
+                weights_path, map_location='cpu' if not torch.cuda.is_available() else None)
         if tempdir:
             # Clean up temp dir
             shutil.rmtree(tempdir)
@@ -852,7 +871,8 @@ class BertPreTrainedModel(nn.Module):
             state_dict._metadata = metadata
 
         def load(module, prefix=''):
-            local_metadata = {} if metadata is None else metadata.get(prefix[:-1], {})
+            local_metadata = {} if metadata is None else metadata.get(
+                prefix[:-1], {})
             module._load_from_state_dict(
                 state_dict, prefix, local_metadata, True, missing_keys, unexpected_keys, error_msgs)
             for name, child in module._modules.items():
@@ -907,15 +927,18 @@ class LXRTModel(BertPreTrainedModel):
         # positions we want to attend and -10000.0 for masked positions.
         # Since we are adding it to the raw scores before the softmax, this is
         # effectively the same as removing these entirely.
-        extended_attention_mask = extended_attention_mask.to(dtype=next(self.parameters()).dtype)  # fp16 compatibility
+        extended_attention_mask = extended_attention_mask.to(
+            dtype=next(self.parameters()).dtype)  # fp16 compatibility
         extended_attention_mask = (1.0 - extended_attention_mask) * -10000.0
 
         # Process the visual attention mask
         if visual_attention_mask is not None:
-            extended_visual_attention_mask = visual_attention_mask.unsqueeze(1).unsqueeze(2)
+            extended_visual_attention_mask = visual_attention_mask.unsqueeze(
+                1).unsqueeze(2)
             extended_visual_attention_mask = extended_visual_attention_mask.to(
                 dtype=next(self.parameters()).dtype)  # fp16 compatibility
-            extended_visual_attention_mask = (1.0 - extended_visual_attention_mask) * -10000.0
+            extended_visual_attention_mask = (
+                1.0 - extended_visual_attention_mask) * -10000.0
         else:
             extended_visual_attention_mask = None
 
@@ -932,7 +955,8 @@ class LXRTModel(BertPreTrainedModel):
             extended_attention_mask,
             visn_feats=visual_feats,
             visn_attention_mask=extended_visual_attention_mask, t=t)
-        # print('lang_feats.shape = ', lang_feats.shape, '; visn_feats.shape = ', visn_feats.shape)
+        print('lang_feats.shape = ', lang_feats.shape,
+              '; visn_feats.shape = ', visn_feats.shape)
 
         if t == 'qa_woi':
             pooled_output = self.pooler_qa_woi(lang_feats)
@@ -943,6 +967,7 @@ class LXRTModel(BertPreTrainedModel):
         else:
             pooled_output = self.pooler(lang_feats)
 
+        # return (None, None), embedding_output
         return (lang_feats, visn_feats), pooled_output
 
 
@@ -976,11 +1001,13 @@ class LXRTPretraining(BertPreTrainedModel):
         self.bert = LXRTModel(config)
 
         # Pre-training heads
-        self.cls = BertPreTrainingHeads(config, self.bert.embeddings.word_embeddings.weight)
+        self.cls = BertPreTrainingHeads(
+            config, self.bert.embeddings.word_embeddings.weight)
         if self.task_obj_predict:
             self.obj_predict_head = BertVisualObjHead(config, visual_losses)
         self.answer_head = BertQuestionAnswerHead(config, self.num_answers)
-        self.question_answer_head = BertQuestionAnswerHead(config, self.num_answers)
+        self.question_answer_head = BertQuestionAnswerHead(
+            config, self.num_answers)
         self.visual_answer_head = VisualAnswerHead(config, self.num_answers)
 
         # Weight initialization
@@ -1004,7 +1031,8 @@ class LXRTPretraining(BertPreTrainedModel):
                 visual_feats=(visual_feats, pos), t='vqa',
             )
 
-            lang_prediction_scores, cross_relationship_score = self.cls(lang_output, pooled_output)
+            lang_prediction_scores, cross_relationship_score = self.cls(
+                lang_output, pooled_output)
 
         # may need some change
         # img ~ question match
@@ -1014,7 +1042,8 @@ class LXRTPretraining(BertPreTrainedModel):
                 visual_feats=(visual_feats, pos), t='vqa',
             )
 
-            lang_prediction_scores_vq, cross_relationship_score_vq = self.cls(lang_output_vq, pooled_output_vq)
+            lang_prediction_scores_vq, cross_relationship_score_vq = self.cls(
+                lang_output_vq, pooled_output_vq)
 
         # question -> answer
         if args.task_qa_woi:
@@ -1033,7 +1062,8 @@ class LXRTPretraining(BertPreTrainedModel):
                 visual_feats=(visual_feats, pos), t='va',
             )
 
-            lang_prediction_scores_va, cross_relationship_score_va = self.cls(lang_output_va, pooled_output_va)
+            lang_prediction_scores_va, cross_relationship_score_va = self.cls(
+                lang_output_va, pooled_output_va)
 
         # img -> answer, answer head classifier, implementation2
         if self.task_va2:
@@ -1050,7 +1080,8 @@ class LXRTPretraining(BertPreTrainedModel):
             pass  # answer_score = pooled_output[0][0]
 
         if self.task_qa_woi:
-            answer_score_qa_woi = self.question_answer_head(pooled_output_qa_woi)
+            answer_score_qa_woi = self.question_answer_head(
+                pooled_output_qa_woi)
             # print('answer_score_qa_woi.shape:', answer_score_qa_woi.shape)
         else:
             pass  # answer_score_qa_woi = pooled_output[0][0]
@@ -1103,7 +1134,8 @@ class LXRTPretraining(BertPreTrainedModel):
             visn_prediction_scores_dict = self.obj_predict_head(visn_output)
             for key in VISUAL_CONFIG.visual_losses:
                 label, mask_conf = obj_labels[key]
-                output_dim, loss_fct_name, label_shape, weight = VISUAL_CONFIG.visual_loss_config[key]
+                output_dim, loss_fct_name, label_shape, weight = VISUAL_CONFIG.visual_loss_config[
+                    key]
                 visn_loss_fct = loss_fcts[loss_fct_name]
                 visn_prediction_scores = visn_prediction_scores_dict[key]
                 visn_loss = visn_loss_fct(
@@ -1183,9 +1215,9 @@ class LXRTFeatureExtraction(BertPreTrainedModel):
         feat_seq, pooled_output = self.bert(input_ids, token_type_ids, attention_mask,
                                             visual_feats=visual_feats,
                                             visual_attention_mask=visual_attention_mask,
-                                            t=t)
+                                            t='qa_woi')
         if 'x' == self.mode:
-            return pooled_output
+            return pooled_output  # size 768 0/1 array
         elif 'x' in self.mode and ('l' in self.mode or 'r' in self.mode):
             return feat_seq, pooled_output
         elif 'l' in self.mode or 'r' in self.mode:

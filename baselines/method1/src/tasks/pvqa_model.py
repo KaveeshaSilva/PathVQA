@@ -31,7 +31,7 @@ class PVQAModel(nn.Module):
         )
         self.logit_fc.apply(self.lxrt_encoder.model.init_bert_weights)
 
-    def forward(self, feat, pos, sent):
+    def forward(self, feat, pos, sent, target_answers):
         """
         b -- batch_size, o -- object_number, f -- visual_feature_size
 
@@ -41,7 +41,7 @@ class PVQAModel(nn.Module):
         :param leng: (b,) Type -- int numpy array
         :return: (b, num_answer) The logit of each answers.
         """
-        x = self.lxrt_encoder(sent, (feat, pos))
+        x = self.lxrt_encoder(sent, (feat, pos), target_answers)
         logit = self.logit_fc(x)
 
         return logit

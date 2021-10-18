@@ -20,10 +20,10 @@ checkpoint_dir = baseUrl+"/checkpoint_LXRT.pth"
 load_dir = baseUrl+"/checkpoint"
 temp_checkpoint_save_dir = baseUrl+"/checkpointtemp_LXRT.pth"
 
-startFrom = 'B'  # M - middle ,   B - beginning
+startFrom = 'M'  # M - middle ,   B - beginning
 
 # default `log_dir` is "runs" - we'll be more specific here
-writer = SummaryWriter(baseUrl+'runs/Pathvqa_experiment_1')
+writer = SummaryWriter('runs/fashion_mnist_experiment_1')
 
 DataTuple = collections.namedtuple("DataTuple", 'dataset loader evaluator')
 valid_bs = 256
@@ -58,14 +58,17 @@ class PVQA:
         # Model
         self.model = PVQAModel(self.train_tuple.dataset.num_answers)
 
+        print('aaaaaaaaaaaaaaaaaaaaaaaaaaaa')
         # Load pre-trained weights
         if args.load_lxmert is not None:
+            print('bbbbbbbbbbbbbbbbbbbbbbbbbbbbb')
             print(args.load_lxmert)
             if(startFrom == 'B'):
                 self.model.lxrt_encoder.load(args.load_lxmert)
             # else:
             #     self.model.lxrt_encoder.load(load_dir)
         if args.load_lxmert_qa is not None:
+            print('cccccccccccccccccccccccccccccc')
             print(args.load_lxmert_qa)
 
             load_lxmert_qa(args.load_lxmert_qa, self.model,
@@ -128,14 +131,9 @@ class PVQA:
 
                 self.optim.zero_grad()
 
-                feats, boxes, target = feats.cuda(), boxes.cuda(), target.cuda()  # target 32 size
+                feats, boxes, target = feats.cuda(), boxes.cuda(), target.cuda()
 
-                target_answers = []
-                for target_label in (target.max(1)[1]).cpu().numpy():
-                    target_ans = dset.label2ans[target_label]
-                    target_answers.append(target_ans)
-
-                logit = self.model(feats, boxes, sent, target_answers)
+                logit = self.model(feats, boxes, sent)
 
                 assert logit.dim() == target.dim() == 2
 
@@ -180,7 +178,7 @@ class PVQA:
                 if valid_score > best_valid:
                     best_valid = valid_score
                     print('model checkpoint saved  epoch:'+str(epoch))
-                    self.save("BEST")
+                    # self.save("BEST")
                     self.newSave(epoch, running_loss)
 
                 log_str += "Epoch- %d: Valid %0.2f\n" % (epoch, valid_score * 100.) + \
@@ -229,7 +227,7 @@ class PVQA:
         quesid2ans = self.predict(eval_tuple, dump)
         return eval_tuple.evaluator.evaluate(quesid2ans)
 
-    @staticmethod
+    @ staticmethod
     def oracle_score(data_tuple):
         dset, loader, evaluator = data_tuple
         quesid2ans = {}
@@ -275,54 +273,16 @@ class PVQA:
 if __name__ == '__main__':
 
     pvqa = PVQA()
-    print('first')
-    if(startFrom == "M"):
-        pvqa.newLoadModel()
-    # Load VQA model weights
-    # Note: It is different from loading LXMERT pre-trained weights.
-    if args.load is not None:
-        # pvqa.load(args.load)
-        pvqa.newLoadModel()
-        print('second')
-    else:
-        print('third')
+    pvqa.newLoadModel()
 
-    # Test or Train
-    if args.test is not None:
-        args.fast = args.tiny = False  # Always loading all data in test
-        if 'test' in args.test:
-            result = pvqa.evaluate(
-                get_data_tuple(args.test, bs=valid_bs,
-                               shuffle=False, drop_last=False),
-                dump=os.path.join(args.output, 'test_predict.json')
-            )
-            print(result)
-            with open(args.output + "/log.log", 'a') as f:
-                f.write('test result=' + str(result))
-                f.flush()
+    pathToImages = "/content/drive/My Drive/PathVQA/data/pvqa/images/test"
+    imageName = input('Enter file name of the image: ').strip()
+    q = input('Enter question: ').strip()
 
-        elif 'val' in args.test:
-            # NOT USED
-            # Since part of valididation data are used in pre-training/fine-tuning,
-            # only validate on the minival set.
-            result = pvqa.evaluate(
-                get_data_tuple('test', bs=valid_bs,
-                               shuffle=False, drop_last=False),
-                dump=os.path.join(args.output, 'test_predict.json')
-            )
-            print(result)
-            with open(args.output + "/log.log", 'a') as f:
-                f.write('test result=' + str(result))
-                f.flush()
+    # TODO:: convert image and question into the relevent format
 
-        else:
-            assert False, "No such test option for %s" % args.test
-    else:
-        print('Splits in Train data:', pvqa.train_tuple.dataset.splits)
-        if pvqa.valid_tuple is not None:
-            print('Splits in Valid data:', pvqa.valid_tuple.dataset.splits)
-            print("Valid Oracle: %0.2f" %
-                  (pvqa.oracle_score(pvqa.valid_tuple) * 100))
-        else:
-            print("DO NOT USE VALIDATION")
-        pvqa.train(pvqa.train_tuple, pvqa.valid_tuple)
+    feats = ''
+    boxes = ''
+    sent = ['ss']
+    logit = pvqa.model(feats, boxes, sent)
+    print(logit)

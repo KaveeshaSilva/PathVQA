@@ -92,9 +92,12 @@ class LXRTEncoder(nn.Module):
     def dim(self):
         return 768
 
-    def forward(self, sents, feats, visual_attention_mask=None):
+    def forward(self, sents, feats, target_answers, visual_attention_mask=None):
+        process_sents = []
+        for i in range(len(target_answers)):
+            process_sents.append(target_answers[i]+" "+sents[i])
         train_features = convert_sents_to_features(
-            sents, self.max_seq_length, self.tokenizer)
+            process_sents, self.max_seq_length, self.tokenizer)
 
         input_ids = torch.tensor(
             [f.input_ids for f in train_features], dtype=torch.long).cuda()
