@@ -173,7 +173,7 @@ class PVQAAdv:
                     feats, boxes, sent, target_answers)  # answer from trained model
 
                 assert q_i_embeeeding.dim() == q_a_embeeeding.dim()
-                print("q_a_embeeeding.dim() :" + q_a_embeeeding.dim())
+                print("q_a_embeeeding.dim() :" + str(q_a_embeeeding.dim()))
 
                 dis_output_q_i = self.discriminator(q_i_embeeeding)
 
