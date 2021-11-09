@@ -92,7 +92,7 @@ class LXRTEncoder(nn.Module):
     def dim(self):
         return 768
 
-    def forward(self, sents, feats, target_answers, visual_attention_mask=None):
+    def forward(self, sents, feats, target_answers, visual_attention_mask=None, t='vqa'):
         process_sents = []
         for i in range(len(target_answers)):
             process_sents.append(target_answers[i]+" "+sents[i])
@@ -108,7 +108,7 @@ class LXRTEncoder(nn.Module):
 
         output = self.model(input_ids, segment_ids, input_mask,
                             visual_feats=feats,
-                            visual_attention_mask=visual_attention_mask)
+                            visual_attention_mask=visual_attention_mask, t=t)
         return output
 
     def save(self, path):

@@ -18,7 +18,7 @@ from tasks.pvqa_data import PVQADataset, PVQATorchDataset, PVQAEvaluator
 baseUrl = 'drive/MyDrive/PathVQA'
 checkpoint_dir = baseUrl+"/checkpoint_LXRT.pth"
 load_dir = baseUrl+"/checkpoint"
-temp_checkpoint_save_dir = baseUrl+"/checkpointtemp_LXRT.pth"
+temp_checkpoint_save_dir = baseUrl+"/checkpoint_with_LXRT.pth"
 
 startFrom = 'B'  # M - middle ,   B - beginning
 
@@ -273,6 +273,7 @@ class PVQA:
         PATH = temp_checkpoint_save_dir
         torch.save({
             'epoch': EPOCH,
+            'model_lxrt': self.model.lxrt_encoder,
             'model_state_dict': self.model.state_dict(),
             'optimizer_state_dict': self.optim.state_dict(),
             'loss': LOSS,

@@ -1210,12 +1210,11 @@ class LXRTFeatureExtraction(BertPreTrainedModel):
         self.apply(self.init_bert_weights)
 
     def forward(self, input_ids, token_type_ids=None, attention_mask=None, visual_feats=None,
-                visual_attention_mask=None):
-        t = 'qa_woi' if args.qa_bl else 'vqa'
+                visual_attention_mask=None, t='vqa'):
+        # t = 'qa_woi' if args.qa_bl else 'vqa'
         feat_seq, pooled_output = self.bert(input_ids, token_type_ids, attention_mask,
                                             visual_feats=visual_feats,
-                                            visual_attention_mask=visual_attention_mask,
-                                            t='qa_woi')
+                                            visual_attention_mask=visual_attention_mask, t=t)
         if 'x' == self.mode:
             return pooled_output  # size 768 0/1 array
         elif 'x' in self.mode and ('l' in self.mode or 'r' in self.mode):

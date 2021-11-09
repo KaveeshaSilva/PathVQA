@@ -10,7 +10,7 @@ from lxrt.modeling import BertLayerNorm, GeLU
 MAX_PVQA_LENGTH = 20
 
 
-class PVQAModel(nn.Module):
+class PVQAAdvModel(nn.Module):
     def __init__(self, num_answers):
         super().__init__()
 
@@ -20,16 +20,16 @@ class PVQAModel(nn.Module):
             args,
             max_seq_length=MAX_PVQA_LENGTH
         )
-        hid_dim = self.lxrt_encoder.dim
+        # hid_dim = self.lxrt_encoder.dim
 
         # VQA Answer heads
-        self.logit_fc = nn.Sequential(
-            nn.Linear(hid_dim, hid_dim * 2),
-            GeLU(),
-            BertLayerNorm(hid_dim * 2, eps=1e-12),
-            nn.Linear(hid_dim * 2, num_answers)
-        )
-        self.logit_fc.apply(self.lxrt_encoder.model.init_bert_weights)
+        # self.logit_fc = nn.Sequential(
+        #     nn.Linear(hid_dim, hid_dim * 2),
+        #     GeLU(),
+        #     BertLayerNorm(hid_dim * 2, eps=1e-12),
+        #     nn.Linear(hid_dim * 2, num_answers)
+        # )
+        # self.logit_fc.apply(self.lxrt_encoder.model.init_bert_weights)
 
     def forward(self, feat, pos, sent, target_answers, t='vqa'):
         """
@@ -42,6 +42,25 @@ class PVQAModel(nn.Module):
         :return: (b, num_answer) The logit of each answers.
         """
         x = self.lxrt_encoder(sent, (feat, pos), target_answers, t=t)
-        logit = self.logit_fc(x)
+        # logit = self.logit_fc(x)
 
-        return logit
+        return x
+
+
+class Discriminator(nn.Module):
+    def __init__(self):
+        super(Discriminator, self).__init__()
+
+        self.model = nn.Sequential(
+            nn.Linear(768, 512),
+            nn.LeakyReLU(0.2, inplace=True),
+            nn.Linear(512, 256),
+            nn.LeakyReLU(0.2, inplace=True),
+            nn.Linear(256, 1),
+            nn.Sigmoid(),
+        )
+
+    def forward(self, embedding):
+        validity = self.model(embedding)
+
+        return validity
