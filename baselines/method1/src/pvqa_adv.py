@@ -84,6 +84,7 @@ class PVQAAdv:
         #     load_lxmert_qa(args.load_lxmert_qa, self.model,
         #                    label2ans=self.train_tuple.dataset.label2ans)
         # GPU options
+        self.discriminator = self.discriminator.cuda()
         self.q_i_model = self.q_i_model.cuda()
         self.q_a_model = self.q_a_model.cuda()
         if args.multiGPU:
