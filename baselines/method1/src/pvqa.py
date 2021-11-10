@@ -283,7 +283,6 @@ class PVQA:
 if __name__ == '__main__':
 
     pvqa = PVQA()
-    pvqa.load(checkpoint_dir)
     print('first')
     if(startFrom == "M"):
         pvqa.newLoadModel()
@@ -291,7 +290,7 @@ if __name__ == '__main__':
     # Note: It is different from loading LXMERT pre-trained weights.
     if args.load is not None:
         # pvqa.load(args.load)
-        pvqa.newLoadModel()
+        # pvqa.newLoadModel()
         print('second')
     else:
         print('third')
