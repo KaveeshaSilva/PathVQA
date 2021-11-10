@@ -54,7 +54,7 @@ def load_tsv(split: str):
     return data
 
 if __name__ == '__main__':
-    
+
     splits = ['test']
     #loading detection features to img_data
     imgid2img = {}
@@ -75,8 +75,8 @@ if __name__ == '__main__':
         img_id = input().strip()
 
         image_fet = imgid2img[img_id]
-        feats = image_fet['features']
-        boxes = image_fet['boxes']
+        feats = torch.from_numpy(image_fet['features'])
+        boxes = torch.from_numpy(image_fet['boxes'])
 
         x = 'y'
 
@@ -86,6 +86,7 @@ if __name__ == '__main__':
 
             #predict and print max 5
             with torch.no_grad():
+                
                 feats, boxes = feats.cuda(), boxes.cuda()
 
                 logit = model(feats, boxes, q, "xxx")
