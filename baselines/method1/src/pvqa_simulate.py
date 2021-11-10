@@ -56,7 +56,7 @@ def load_tsv(split: str):
 
 if __name__ == '__main__':
 
-    splits = ['test']
+    splits = ['test','train']
     # loading detection features to img_data
     imgid2img = {}
     for split in splits:
@@ -71,6 +71,7 @@ if __name__ == '__main__':
     model = PVQAModel(4092)
     state_dict = torch.load("%s.pth" % model_dir)
     model.load_state_dict(state_dict["model_state_dict"])
+    model = model.cuda()
 
     while True:
         print('Enter image name (ex:- test_0001):')
@@ -97,7 +98,7 @@ if __name__ == '__main__':
                 logit = model(feats, boxes, sents, targets)
                 score, label = logit.max(1)
 
-            print(label2ans[label]+" - "+score)
+            print(label2ans[label])
 
             print('Question about previous image? (y/n)')
             x = input().strip()
