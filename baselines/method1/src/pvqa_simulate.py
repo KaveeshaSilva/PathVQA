@@ -91,7 +91,7 @@ if __name__ == '__main__':
                 
                 feats, boxes = feats.cuda(), boxes.cuda()
 
-                logit = model(feats, boxes, q, "xxx")
+                logit = model(feats, boxes, q, [])
                 score, label = logit.max(1)
 
             print(label2ans[label]+" - "+score)
