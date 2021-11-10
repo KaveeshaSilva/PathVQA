@@ -20,7 +20,7 @@ from nltk.translate.bleu_score import sentence_bleu
 from tasks.pvqa_model import PVQAModel
 
 baseUrl = 'drive/MyDrive/PathVQA/'
-model_dir = baseUrl+"/checkpointtemp_LXRT.pth"
+model_dir = baseUrl+"checkpointtemp_LXRT"
 
 
 FIELDNAMES = ['image_id', 'image_w', 'image_h',
@@ -53,10 +53,11 @@ def load_tsv(split: str):
 
     return data
 
+
 if __name__ == '__main__':
 
     splits = ['test']
-    #loading detection features to img_data
+    # loading detection features to img_data
     imgid2img = {}
     for split in splits:
         data = load_tsv(split)
@@ -64,7 +65,8 @@ if __name__ == '__main__':
         for datum in data:
             imgid2img[datum['img_id']] = datum
 
-    label2ans = pickle.load(open(baseUrl+'data/pvqa/qas/trainval_label2ans.pkl', 'rb'))
+    label2ans = pickle.load(
+        open(baseUrl+'data/pvqa/qas/trainval_label2ans.pkl', 'rb'))
 
     model = PVQAModel(4092)
     state_dict = torch.load("%s.pth" % model_dir)
@@ -80,20 +82,19 @@ if __name__ == '__main__':
 
         x = 'y'
 
-        while (x in ['y','Y']):
+        while (x in ['y', 'Y']):
             print('Enter a question:')
             q = input().strip()
 
-            #predict and print max 5
+            # predict and print max 5
             with torch.no_grad():
                 
                 feats, boxes = feats.cuda(), boxes.cuda()
 
                 logit = model(feats, boxes, q, "xxx")
                 score, label = logit.max(1)
-            
+
             print(label2ans[label]+" - "+score)
 
             print('Question about previous image? (y/n)')
             x = input().strip()
-
