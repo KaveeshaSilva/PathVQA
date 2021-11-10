@@ -284,7 +284,6 @@ class PVQA:
 if __name__ == '__main__':
 
     pvqa = PVQA()
-
     print('first')
     if(startFrom == "M"):
         pvqa.newLoadModel()
