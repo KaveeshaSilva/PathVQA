@@ -53,44 +53,46 @@ def load_tsv(split: str):
 
     return data
 
-splits = ['test']
-# loading detection features to img_data
-imgid2img = {}
-for split in splits:
-    data = load_tsv(split)
+if __name__ == '__main__':
+    
+    splits = ['test']
+    #loading detection features to img_data
+    imgid2img = {}
+    for split in splits:
+        data = load_tsv(split)
 
-    for datum in data:
-        imgid2img[datum['img_id']] = datum
+        for datum in data:
+            imgid2img[datum['img_id']] = datum
 
-label2ans = pickle.load(open(baseUrl+'data/pvqa/qas/trainval_label2ans.pkl', 'rb'))
+    label2ans = pickle.load(open(baseUrl+'data/pvqa/qas/trainval_label2ans.pkl', 'rb'))
 
-model = PVQAModel(4092)
-state_dict = torch.load("%s.pth" % model_dir)
-model.load_state_dict(state_dict["model_state_dict"])
+    model = PVQAModel(4092)
+    state_dict = torch.load("%s.pth" % model_dir)
+    model.load_state_dict(state_dict["model_state_dict"])
 
-while True:
-    print('Enter image name (ex:- test_0001):')
-    img_id = input().strip()
+    while True:
+        print('Enter image name (ex:- test_0001):')
+        img_id = input().strip()
 
-    image_fet = imgid2img[img_id]
-    feats = image_fet['features']
-    boxes = image_fet['boxes']
+        image_fet = imgid2img[img_id]
+        feats = image_fet['features']
+        boxes = image_fet['boxes']
 
-    x = 'y'
+        x = 'y'
 
-    while (x in ['y','Y']):
-        print('Enter a question:')
-        q = input().strip()
+        while (x in ['y','Y']):
+            print('Enter a question:')
+            q = input().strip()
 
-        #predict and print max 5
-        with torch.no_grad():
-            feats, boxes = feats.cuda(), boxes.cuda()
+            #predict and print max 5
+            with torch.no_grad():
+                feats, boxes = feats.cuda(), boxes.cuda()
 
-            logit = model(feats, boxes, q, "xxx")
-            score, label = logit.max(1)
-        
-        print(label2ans[label]+" - "+score)
+                logit = model(feats, boxes, q, "xxx")
+                score, label = logit.max(1)
+            
+            print(label2ans[label]+" - "+score)
 
-        print('Question about previous image? (y/n)')
-        x = input().strip()
+            print('Question about previous image? (y/n)')
+            x = input().strip()
 
