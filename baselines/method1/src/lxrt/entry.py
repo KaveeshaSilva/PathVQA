@@ -93,11 +93,16 @@ class LXRTEncoder(nn.Module):
         return 768
 
     def forward(self, sents, feats, target_answers, visual_attention_mask=None, t='vqa'):
-        process_sents = []
-        for i in range(len(target_answers)):
-            process_sents.append(target_answers[i]+" "+sents[i])
-        train_features = convert_sents_to_features(
-            process_sents, self.max_seq_length, self.tokenizer)
+        if(t=="qa_woi"):  
+            process_sents = []
+            for i in range(len(target_answers)):
+                process_sents.append(target_answers[i]+" "+sents[i])
+            train_features = convert_sents_to_features(
+                process_sents, self.max_seq_length, self.tokenizer)
+        else:
+            train_features = convert_sents_to_features(
+                sents, self.max_seq_length, self.tokenizer)
+
 
         input_ids = torch.tensor(
             [f.input_ids for f in train_features], dtype=torch.long).cuda()
