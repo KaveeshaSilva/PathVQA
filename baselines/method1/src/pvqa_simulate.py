@@ -79,6 +79,7 @@ if __name__ == '__main__':
         image_fet = imgid2img[img_id]
         feats = torch.tensor(image_fet['features'])
         boxes = torch.tensor(image_fet['boxes'])
+        targets = torch.tensor(['ex'])
 
         x = 'y'
 
@@ -89,9 +90,9 @@ if __name__ == '__main__':
             # predict and print max 5
             with torch.no_grad():
                 
-                feats, boxes = feats.cuda(), boxes.cuda()
+                feats, boxes, targets = feats.cuda(), boxes.cuda(), targets.cuda()
 
-                logit = model(feats, boxes, q, ["example"])
+                logit = model(feats, boxes, q, targets)
                 score, label = logit.max(1)
 
             print(label2ans[label]+" - "+score)
