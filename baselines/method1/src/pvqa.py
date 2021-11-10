@@ -123,7 +123,8 @@ class PVQA:
         for epoch in range(start_epoch, args.epochs):
             print("Start new epoch - epoch number : "+str(epoch))
             quesid2ans = {}
-            for i, (ques_id, feats, boxes, sent, target) in iter_wrapper(enumerate(loader)):
+            for i, (ques_id, feats, boxes, sent, target, img_id, img_info) in iter_wrapper(enumerate(loader)):
+
                 self.model.train()
 
                 self.optim.zero_grad()
@@ -213,7 +214,7 @@ class PVQA:
 
         for i, datum_tuple in enumerate(loader):
             # Avoid seeing ground truth
-            ques_id, feats, boxes, sent, target = datum_tuple
+            ques_id, feats, boxes, sent, target, img_id, img_info = datum_tuple
             with torch.no_grad():
                 feats, boxes = feats.cuda(), boxes.cuda()
 
@@ -240,7 +241,7 @@ class PVQA:
     def oracle_score(data_tuple):
         dset, loader, evaluator = data_tuple
         quesid2ans = {}
-        for i, (ques_id, feats, boxes, sent, target) in enumerate(loader):
+        for i, (ques_id, feats, boxes, sent, target, img_id, img_info) in enumerate(loader):
             _, label = target.max(1)
             for qid, l in zip(ques_id, label.cpu().numpy()):
                 ans = dset.label2ans[l]
@@ -283,7 +284,7 @@ class PVQA:
 if __name__ == '__main__':
 
     pvqa = PVQA()
-    pvqa.load(checkpoint_dir)
+
     print('first')
     if(startFrom == "M"):
         pvqa.newLoadModel()
@@ -291,7 +292,7 @@ if __name__ == '__main__':
     # Note: It is different from loading LXMERT pre-trained weights.
     if args.load is not None:
         # pvqa.load(args.load)
-        pvqa.newLoadModel()
+        # pvqa.newLoadModel()
         print('second')
     else:
         print('third')
