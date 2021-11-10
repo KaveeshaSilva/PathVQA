@@ -77,8 +77,8 @@ if __name__ == '__main__':
         img_id = input().strip()
 
         image_fet = imgid2img[img_id]
-        feats = torch.from_numpy(image_fet['features'])
-        boxes = torch.from_numpy(image_fet['boxes'])
+        feats = torch.tensor(image_fet['features'])
+        boxes = torch.tensor(image_fet['boxes'])
 
         x = 'y'
 
