@@ -28,14 +28,14 @@ do
   res_output=${baseUrl}/baselines/method1/snap/pvqa/$res_name
   mkdir -p $res_output
 
-  # See Readme.md for option details.
-  CUDA_VISIBLE_DEVICES=0 PYTHONPATH=$PYTHONPATH:./src \
-      python ${baseUrl}/baselines/method1/src/pvqa.py \
-      --test test  --train val --valid "" \
-      --load ${ft_output}/BEST \
-      --llayers 9 --xlayers 5 --rlayers 5 \
-      --batchSize 32 --optim bert --lr 5e-5 --epochs 4 \
-      --seed $seed --pvqaimgv $imgv \
-      --tqdm --output $res_output
+#   # See Readme.md for option details.
+#   CUDA_VISIBLE_DEVICES=0 PYTHONPATH=$PYTHONPATH:./src \
+#       python ${baseUrl}/baselines/method1/src/pvqa.py \
+#       --test test  --train val --valid "" \
+#       --load ${ft_output}/BEST \
+#       --llayers 9 --xlayers 5 --rlayers 5 \
+#       --batchSize 32 --optim bert --lr 5e-5 --epochs 4 \
+#       --seed $seed --pvqaimgv $imgv \
+#       --tqdm --output $res_output
 
 done
