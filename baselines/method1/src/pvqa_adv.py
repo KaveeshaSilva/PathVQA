@@ -148,9 +148,9 @@ class PVQAAdv:
             for i, (ques_id, feats, boxes, sent, target) in iter_wrapper(enumerate(loader)):
 
                 # Adversarial ground truths
-                valid = Variable(Tensor(64, 1).fill_(1.0),  # 64 is the batch size
+                valid = Variable(Tensor(32, 1).fill_(1.0),  # 32 is the batch size
                                  requires_grad=False)
-                fake = Variable(Tensor(64, 1).fill_(0.0),  # 64 is the batch size
+                fake = Variable(Tensor(32, 1).fill_(0.0),  # 32 is the batch size
                                 requires_grad=False)
 
                 self.q_i_model.train()
