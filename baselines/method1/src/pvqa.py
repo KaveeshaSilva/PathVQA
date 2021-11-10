@@ -283,6 +283,7 @@ class PVQA:
 if __name__ == '__main__':
 
     pvqa = PVQA()
+    pvqa.load(checkpoint_dir)
     print('first')
     if(startFrom == "M"):
         pvqa.newLoadModel()

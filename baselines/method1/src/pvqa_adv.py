@@ -227,7 +227,7 @@ class PVQAAdv:
                     #                       epoch * len(loader) + i)
                 # //////////////////////////////////////////          continue from here
 
-                nn.utils.clip_grad_norm_(self.model.parameters(), 5.)
+                nn.utils.clip_grad_norm_(self.q_i_model.parameters(), 5.)
                 self.optim.step()
 
                 # score, label = q_i_embeeeding.max(1)
