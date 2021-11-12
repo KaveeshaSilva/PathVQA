@@ -172,6 +172,8 @@ class PVQA:
                 for qid, l in zip(ques_id, label.cpu().numpy()):
                     ans = dset.label2ans[l]
                     quesid2ans[qid.item()] = ans
+            if(epoch == 50):
+                self.newSave(epoch, running_loss)  # save model when epoch = 50
 
             log_str = "\nEpoch- %d: Train %0.2f\n" % (
                 epoch, evaluator.evaluate(quesid2ans) * 100.)
@@ -181,8 +183,8 @@ class PVQA:
                 if valid_score > best_valid:
                     best_valid = valid_score
                     print('model checkpoint saved  epoch:'+str(epoch))
-                    self.save("BEST")
-                    self.newSave(epoch, running_loss)
+                    # self.save("BEST")
+                    # self.newSave(epoch, running_loss)
 
                 log_str += "Epoch- %d: Valid %0.2f\n" % (epoch, valid_score * 100.) + \
                            "Epoch- %d: Best %0.2f\n" % (
@@ -276,6 +278,7 @@ class PVQA:
             'epoch': EPOCH,
             'model_lxrt': self.model.lxrt_encoder,
             'model_state_dict': self.model.state_dict(),
+            'full_model': self.model,
             'optimizer_state_dict': self.optim.state_dict(),
             'loss': LOSS,
         }, PATH)
