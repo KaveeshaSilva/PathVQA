@@ -955,9 +955,9 @@ class LXRTModel(BertPreTrainedModel):
             extended_attention_mask,
             visn_feats=visual_feats,
             visn_attention_mask=extended_visual_attention_mask, t=t)
-        print('lang_feats.shape = ', lang_feats.shape,
-              '; visn_feats.shape = ', visn_feats.shape)
-
+        # print('lang_feats.shape = ', lang_feats.shape,
+        #       '; visn_feats.shape = ', visn_feats.shape)
+        print('t : ' + t)
         if t == 'qa_woi':
             pooled_output = self.pooler_qa_woi(lang_feats)
             # print('qa_woi: pooled_output.shape = ', pooled_output.shape)

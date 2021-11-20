@@ -23,7 +23,7 @@ temp_checkpoint_save_dir = baseUrl+"/checkpoint_with_LXRT.pth"
 startFrom = 'B'  # M - middle ,   B - beginning
 
 # default `log_dir` is "runs" - we'll be more specific here
-writer = SummaryWriter(baseUrl+'runs/Pathvqa_experiment_2')
+writer = SummaryWriter(baseUrl+'runs/Pathvqa_experiment_1')
 
 DataTuple = collections.namedtuple("DataTuple", 'dataset loader evaluator')
 valid_bs = 256
@@ -136,8 +136,7 @@ class PVQA:
                     target_ans = dset.label2ans[target_label]
                     target_answers.append(target_ans)
 
-                logit = self.model(feats, boxes, sent,
-                                   target_answers, t='qa_woi')
+                logit = self.model(feats, boxes, sent, target_answers)
 
                 assert logit.dim() == target.dim() == 2
 
@@ -163,7 +162,7 @@ class PVQA:
                         valid_score = self.evaluate(eval_tuple)
                         writer.add_scalar('validation loss',
                                           valid_score,
-                                          epoch * len(loader) + i)   # x-axis is the number of batches
+                                          epoch * len(loader) + i)
                 # //////////////////////////////////////////
 
                 nn.utils.clip_grad_norm_(self.model.parameters(), 5.)
@@ -173,7 +172,7 @@ class PVQA:
                 for qid, l in zip(ques_id, label.cpu().numpy()):
                     ans = dset.label2ans[l]
                     quesid2ans[qid.item()] = ans
-            if(epoch % 10 == 0):
+            if(epoch == 50):
                 self.newSave(epoch, running_loss)  # save model when epoch = 50
 
             log_str = "\nEpoch- %d: Train %0.2f\n" % (
@@ -278,7 +277,6 @@ class PVQA:
         torch.save({
             'epoch': EPOCH,
             'model_lxrt': self.model.lxrt_encoder,
-            'model_lxrt_state_dict': self.model.lxrt_encoder.state_dict(),
             'model_state_dict': self.model.state_dict(),
             'full_model': self.model,
             'optimizer_state_dict': self.optim.state_dict(),
