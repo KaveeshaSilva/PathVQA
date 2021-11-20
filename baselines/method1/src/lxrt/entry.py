@@ -99,7 +99,7 @@ class LXRTEncoder(nn.Module):
                 process_sents.append(target_answers[i]+" "+sents[i])
             train_features = convert_sents_to_features(
                 process_sents, self.max_seq_length, self.tokenizer)
-            print('process_sents[0] : '+str(process_sents[0]))
+            # print('process_sents[0] : '+str(process_sents[0]))
         else:
             train_features = convert_sents_to_features(
                 sents, self.max_seq_length, self.tokenizer)
