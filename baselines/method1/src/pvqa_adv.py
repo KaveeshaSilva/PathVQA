@@ -148,7 +148,7 @@ class PVQAAdv:
         for epoch in range(start_epoch, args.epochs):
             print("Start new epoch - epoch number : "+str(epoch))
             quesid2ans = {}
-            for i, (ques_id, feats, boxes, sent, target) in iter_wrapper(enumerate(loader)):
+            for i, (ques_id, feats, boxes, sent, target, img_id, img_info) in iter_wrapper(enumerate(loader)):
 
                 # Adversarial ground truths
                 valid = Variable(Tensor(32, 1).fill_(1.0),  # 32 is the batch size
