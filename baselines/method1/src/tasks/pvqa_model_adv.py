@@ -41,8 +41,9 @@ class PVQAAdvModel(nn.Module):
         :param leng: (b,) Type -- int numpy array
         :return: (b, num_answer) The logit of each answers.
         """
-        x = self.lxrt_encoder(sent, (feat, pos), target_answers, t=t)
-        # logit = self.logit_fc(x)
+        x = self.lxrt_encoder(
+            sent, (feat, pos), target_answers, t=t)  # embedding
+        # logit = self.logit_fc(x) #answer prediction
 
         return x
 

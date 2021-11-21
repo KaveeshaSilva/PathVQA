@@ -22,12 +22,15 @@ from tasks.pvqa_data import PVQADataset, PVQATorchDataset, PVQAEvaluator
 baseUrl = 'drive/MyDrive/PathVQA'
 checkpoint_dir = baseUrl+"/checkpoint_with_LXRT_1.pth"
 load_dir = baseUrl+"/checkpoint"
-temp_checkpoint_save_dir = baseUrl+"/checkpointtemp_LXRT.pth"
+temp_checkpoint_save_dir = baseUrl+"/checkpoint_with_LXRT.pth"
+adv_model_dir = baseUrl+"/model_qa_all.pth"
 
 startFrom = 'B'  # M - middle ,   B - beginning
 
 # default `log_dir` is "runs" - we'll be more specific here
-writer = SummaryWriter(baseUrl+'runs/Pathvqa_experiment_1')
+print('start writer creating')
+writer = SummaryWriter(baseUrl+'runs/Pathvqa_experiment_adv')
+print('finished writer creating')
 
 DataTuple = collections.namedtuple("DataTuple", 'dataset loader evaluator')
 valid_bs = 256
@@ -171,7 +174,7 @@ class PVQAAdv:
                 q_i_embeeeding = self.q_i_model(
                     feats, boxes, sent, target_answers)
                 q_a_embeeeding = self.q_a_model(
-                    feats, boxes, sent, target_answers)  # answer from trained model
+                    feats, boxes, sent, target_answers, t='qa_woi')  # answer from trained model
 
                 assert q_i_embeeeding.dim() == q_a_embeeeding.dim()
                 print("q_a_embeeeding.dim() :" + str(q_a_embeeeding.dim()))
@@ -234,7 +237,9 @@ class PVQAAdv:
                 # for qid, l in zip(ques_id, label.cpu().numpy()):
                 #     ans = dset.label2ans[l]
                 #     quesid2ans[qid.item()] = ans
-
+            if(epoch % 10 == 0):
+                # save model when epoch = 50
+                self.newSave(epoch, running_loss_g)
             # log_str = "\nEpoch- %d: Train %0.2f\n" % (
             #     epoch, evaluator.evaluate(quesid2ans) * 100.)
 
@@ -321,7 +326,7 @@ class PVQAAdv:
         self.model.load_state_dict(state_dict)
 
     def newLoadModel(self):
-        PATH = checkpoint_dir
+        PATH = adv_model_dir
         checkpoint = torch.load(PATH)
         return checkpoint
         # self.q_a_model.load_state_dict(checkpoint['model_state_dict'])
@@ -337,8 +342,11 @@ class PVQAAdv:
         PATH = temp_checkpoint_save_dir
         torch.save({
             'epoch': EPOCH,
-            'model_state_dict': self.model.state_dict(),
-            'optimizer_state_dict': self.optim.state_dict(),
+            'model_lxrt': self.q_i_model.lxrt_encoder,
+            'model_lxrt_state_dict': self.q_i_model.lxrt_encoder.state_dict(),
+            'model_state_dict': self.q_i_model.state_dict(),
+            'full_model': self.q_i_model,
+            'optimizer_state_dict': self.optimizer_G.state_dict(),
             'loss': LOSS,
         }, PATH)
 
