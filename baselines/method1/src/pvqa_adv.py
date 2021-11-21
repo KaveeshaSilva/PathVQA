@@ -230,8 +230,9 @@ class PVQAAdv:
                     #                       epoch * len(loader) + i)
                 # //////////////////////////////////////////          continue from here
 
+                # added becoz of adv learning
                 nn.utils.clip_grad_norm_(self.q_i_model.parameters(), 5.)
-                self.optim.step()
+                self.optimizer_D.step()
 
                 # score, label = q_i_embeeeding.max(1)
                 # for qid, l in zip(ques_id, label.cpu().numpy()):
