@@ -266,6 +266,7 @@ class PVQA:
     def newLoadModel(self):
         PATH = adv_model_dir
         checkpoint = torch.load(PATH)
+        return checkpoint
         self.model.load_state_dict(checkpoint['model_state_dict'])
         self.optim.load_state_dict(checkpoint['optimizer_state_dict'])
 
