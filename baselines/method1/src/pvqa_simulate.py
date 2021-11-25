@@ -5,6 +5,7 @@ import json
 import os
 import pandas as pd
 import pickle
+import cv2
 
 import numpy as np
 import torch
@@ -56,7 +57,7 @@ def load_tsv(split: str):
 
 if __name__ == '__main__':
 
-    splits = ['test','train']
+    splits = ['test']
     # loading detection features to img_data
     imgid2img = {}
     for split in splits:
@@ -74,8 +75,18 @@ if __name__ == '__main__':
     model = model.cuda()
 
     while True:
+        cv2.destroyAllWindows()
+        filePath = '/gdrive/My Drive/PathVQA/pvqa/images/test/'
         print('Enter image name (ex:- test_0001):')
         img_id = input().strip()
+        imgnameParts=img_id.split("_")
+        if(imgnameParts[0]!="test"):
+            if(len(imgnameParts[1])!=4):
+                print('Wrong image name..')
+
+        filePath+=img_id+".jpg"
+        image = cv2.imread(filePath)
+        cv2.imshow(img_id,image)
 
         image_fet = imgid2img[img_id]
         feats = torch.tensor([image_fet['features']])
