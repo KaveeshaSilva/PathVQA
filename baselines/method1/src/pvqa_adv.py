@@ -23,13 +23,14 @@ baseUrl = 'drive/MyDrive/PathVQA'
 checkpoint_dir = baseUrl+"/checkpoint_with_LXRT_1.pth"
 load_dir = baseUrl+"/checkpoint"
 temp_checkpoint_save_dir = baseUrl+"/checkpoint_with_LXRT.pth"
+new_checkpoint_save_dir = baseUrl+"/checkpoint_new_LXRT.pth"
 adv_model_dir = baseUrl+"/model_qa_all.pth"
 
 startFrom = 'B'  # M - middle ,   B - beginning
 
 # default `log_dir` is "runs" - we'll be more specific here
 print('start writer creating')
-writer = SummaryWriter(baseUrl+'runs/Pathvqa_experiment_adv')
+writer = SummaryWriter(baseUrl+'runs/Pathvqa_experiment_adv_new')
 print('finished writer creating')
 
 DataTuple = collections.namedtuple("DataTuple", 'dataset loader evaluator')
@@ -66,20 +67,29 @@ class PVQAAdv:
             self.valid_tuple = None
 
         # Model
-        self.q_i_model = PVQAAdvModel(self.train_tuple.dataset.num_answers)
+        checkpoint = None
+        if(startFrom == 'B'):
+            self.q_i_model = PVQAAdvModel(self.train_tuple.dataset.num_answers)
+            self.discriminator = Discriminator()
+
+        else:
+            checkpoint = self.loadModelCheckpoint()
+            self.q_i_model = checkpoint['saved_full_model']
+            self.discriminator = checkpoint['saved_Discriminator']
+
         self.q_a_model = PVQAAdvModel(self.train_tuple.dataset.num_answers)
         # self.q_a_model = self.q_a_full_model.lxrt_encoder
         # self.q_a_model.load_state_dict(self.newLoadModel()['model_lxrt'])
-        self.q_a_model.lxrt_encoder = self.newLoadModel()['model_lxrt']
+        self.q_a_model.lxrt_encoder = self.loadQAModel()['model_lxrt']
         # self.q_a_model = PVQAAdvModel(
         #     self.train_tuple.dataset.num_answers)  # load model
-        self.discriminator = Discriminator()
 
-        # Load pre-trained weights
-        if args.load_lxmert is not None:
-            print(args.load_lxmert)
-            self.q_i_model.lxrt_encoder.load(args.load_lxmert)
-            # self.q_a_model.lxrt_encoder.load(args.load_lxmert)
+        if(startFrom == 'B'):
+            # Load pre-trained weights
+            if args.load_lxmert is not None:
+                print(args.load_lxmert)
+                self.q_i_model.lxrt_encoder.load(args.load_lxmert)
+                # self.q_a_model.lxrt_encoder.load(args.load_lxmert)
 
         # if args.load_lxmert_qa is not None:
         #     print(args.load_lxmert_qa)
@@ -107,10 +117,15 @@ class PVQAAdv:
         #                           t_total=t_total)
         # else:
             # self.optim = args.optimizer(self.model.parameters(), args.lr)
-        self.optimizer_G = torch.optim.Adam(
-            self.q_i_model.parameters(), lr=0.0002, betas=(0.5, 0.999))
-        self.optimizer_D = torch.optim.Adam(
-            self.discriminator.parameters(), lr=0.0002, betas=(0.5, 0.999))
+        if(startFrom == 'B'):
+            self.optimizer_G = torch.optim.Adam(
+                self.q_i_model.parameters(), lr=0.0002, betas=(0.5, 0.999))
+            self.optimizer_D = torch.optim.Adam(
+                self.discriminator.parameters(), lr=0.0002, betas=(0.5, 0.999))
+        else:
+            self.optimizer_G = checkpoint['saved_optimizer_G']
+            self.optimizer_D = checkpoint['saved_optimizer_D']
+
         self.adversarial_loss = torch.nn.BCELoss()
 
         # Output Directory
@@ -128,14 +143,17 @@ class PVQAAdv:
         running_loss_g = 0
         running_loss_d = 0
         # print('loss and epoch reset')
-        # if(startFrom == "M"):
-        #     print('loading from saved model..')
-        #     checkpoint = self.getLastEpoch()
-        #     lastEpoch = checkpoint['epoch']
-        #     running_loss = checkpoint['loss']
-        #     print("last epoch :" + str(lastEpoch))
-        #     print('loss')
-        #     print(running_loss)
+        if(startFrom == "M"):
+            print('loading from saved model..')
+            checkpoint = self.loadModelCheckpoint()
+            lastEpoch = checkpoint['last_epoch']
+            running_loss_g = checkpoint['last_running_loss_g']
+            running_loss_d = checkpoint['last_running_loss_d']
+            print("last epoch :" + str(lastEpoch))
+            print('loss g')
+            print(running_loss_g)
+            print('loss d')
+            print(running_loss_d)
 
         start_epoch = lastEpoch + 1  # new
 
@@ -240,7 +258,8 @@ class PVQAAdv:
                 #     quesid2ans[qid.item()] = ans
             if(epoch % 10 == 0):
                 # save model when epoch = 50
-                self.newSave(epoch, running_loss_g)
+                print('checkpoint saved.  epoch : ' + str(epoch))
+                self.saveModelCheckpoint(epoch, running_loss_g, running_loss_d)
             # log_str = "\nEpoch- %d: Train %0.2f\n" % (
             #     epoch, evaluator.evaluate(quesid2ans) * 100.)
 
@@ -326,12 +345,35 @@ class PVQAAdv:
         state_dict = torch.load("%s.pth" % path)
         self.model.load_state_dict(state_dict)
 
-    def newLoadModel(self):
+    def loadQAModel(self):
         PATH = adv_model_dir
         checkpoint = torch.load(PATH)
         return checkpoint
         # self.q_a_model.load_state_dict(checkpoint['model_state_dict'])
         # self.optim.load_state_dict(checkpoint['optimizer_state_dict'])
+
+    def loadModelCheckpoint(self):
+        PATH = new_checkpoint_save_dir
+        checkpoint = torch.load(PATH)
+        return checkpoint
+
+    def saveModelCheckpoint(self, EPOCH, LOSS_G, LOSS_D):
+        PATH = new_checkpoint_save_dir
+        torch.save({
+            'last_epoch': EPOCH,
+            'model_lxrt': self.q_i_model.lxrt_encoder,
+            'model_lxrt_state_dict': self.q_i_model.lxrt_encoder.state_dict(),
+            'saved_full_model_state_dict': self.q_i_model.state_dict(),
+            'saved_full_model': self.q_i_model,
+            'saved_Discriminator_state_dict': self.discriminator.state_dict(),
+            'saved_Discriminator': self.discriminator,
+            'saved_optimizer_G_state_dict': self.optimizer_G.state_dict(),
+            'saved_optimizer_G': self.optimizer_G,
+            'saved_optimizer_D_state_dict': self.optimizer_D.state_dict(),
+            'saved_optimizer_D': self.optimizer_D,
+            'last_running_loss_d': LOSS_D,
+            'last_running_loss_g': LOSS_G,
+        }, PATH)
 
     def getLastEpoch(self):
         PATH = checkpoint_dir
