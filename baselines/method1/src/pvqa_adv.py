@@ -26,7 +26,7 @@ temp_checkpoint_save_dir = baseUrl+"/checkpoint_with_LXRT.pth"
 new_checkpoint_save_dir = baseUrl+"/checkpoint_new_LXRT.pth"
 adv_model_dir = baseUrl+"/model_qa_all.pth"
 
-startFrom = 'B'  # M - middle ,   B - beginning
+startFrom = 'M'  # M - middle ,   B - beginning
 
 # default `log_dir` is "runs" - we'll be more specific here
 print('start writer creating')
@@ -256,7 +256,7 @@ class PVQAAdv:
                 # for qid, l in zip(ques_id, label.cpu().numpy()):
                 #     ans = dset.label2ans[l]
                 #     quesid2ans[qid.item()] = ans
-            if(epoch % 10 == 0):
+            if(epoch % 5 == 0):
                 # save model when epoch = 50
                 print('checkpoint saved.  epoch : ' + str(epoch))
                 self.saveModelCheckpoint(epoch, running_loss_g, running_loss_d)
@@ -270,7 +270,8 @@ class PVQAAdv:
             #         print('model checkpoint saved  epoch:'+str(epoch))
             #         self.save("BEST")
             #         # self.newSave(epoch, running_loss_)
-
+            print('Epoch : '+str(epoch)+'  gen loss: ' +
+                  str(running_loss_g/100)+'     disc loss: '+str(running_loss_d/100))
             #     log_str += "Epoch- %d: Valid %0.2f\n" % (epoch, valid_score * 100.) + \
             #                "Epoch- %d: Best %0.2f\n" % (
             #                    epoch, best_valid * 100.)
