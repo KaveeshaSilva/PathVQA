@@ -15,7 +15,7 @@ from param import args
 from pretrain.qa_answer_table import load_lxmert_qa
 from tasks.pvqa_model import PVQAModel
 from tasks.pvqa_data import PVQADataset, PVQATorchDataset, PVQAEvaluator
-from PIL import Image
+import matplotlib.image as mpimg
 import matplotlib.pyplot as plt
 import numpy as np
 baseUrl = 'drive/MyDrive/PathVQA'
@@ -26,7 +26,7 @@ temp_checkpoint_save_dir = baseUrl+"/checkpoint_with_LXRT.pth"
 startFrom = 'B'  # M - middle ,   B - beginning
 
 # default `log_dir` is "runs" - we'll be more specific here
-writer = SummaryWriter(baseUrl+'runs/Pathvqa_experiment_2')
+writer = SummaryWriter(baseUrl+'runs/Pathvqa_experiment_check_image')
 
 DataTuple = collections.namedtuple("DataTuple", 'dataset loader evaluator')
 valid_bs = 256
@@ -240,8 +240,8 @@ class PVQA:
                     prediction_answers.append(ans)
                     quesid2ans[qid.item()] = ans
                 
-                if writeExamples:
-                    self.writeIntermediateExamples(img_id,sent, prediction_answers,target_answers,3)
+                if writeExamples and i==0:
+                    self.writeIntermediateExamples(img_id,sent, prediction_answers,target_answers,3,step)
 
         if dump is not None:
             evaluator.dump_result(quesid2ans, dump)
@@ -300,34 +300,36 @@ class PVQA:
     def matplotlib_imshow(self,img, one_channel=False):
         if one_channel:
             img = img.mean(dim=0)
-        img = img / 2 + 0.5     # unnormalize
-        npimg = img.numpy()
+        # img = img / 2 + 0.5     # unnormalize
+        # npimg = img.numpy()
         if one_channel:
-            plt.imshow(npimg, cmap="Greys")
+            plt.imshow(img, cmap="Greys")
         else:
-            plt.imshow(np.transpose(npimg, (1, 2, 0)))
+            plt.imshow(img)
 
     def writeIntermediateExamples(self,images_id,question,prediction_answers,real_answers,num_of_images,step):
         filePath = 'drive/MyDrive/PathVQA/data/pvqa/images/'
+        data_locations = [0,5,12]
         images = []
         for i in range(num_of_images):
-            imgnameParts=images_id[i].split("_")
+            imgnameParts=images_id[data_locations[i]].split("_")
             if((imgnameParts[0] not in ["test","train","val"]) or (len(imgnameParts[1])!=4)):
                 print('Wrong image name...')
-            filePath+=imgnameParts[0]+"/"+images_id[i]+".jpg"
-            im = Image.open(filePath)
+            # filePath+=imgnameParts[0]+"/"+images_id[i]+".jpg"
+            im = mpimg.imread(filePath+imgnameParts[0]+"/"+images_id[data_locations[i]]+".jpg")
             images.append(im)
 
         fig = plt.figure(figsize=(12, 48))
         for idx in np.arange(num_of_images):
             ax = fig.add_subplot(1, num_of_images, idx+1, xticks=[], yticks=[])
-            self.matplotlib_imshow(images[idx], one_channel=True)
+            self.matplotlib_imshow(images[idx])
 
-            ax.set_title("question: {0}\nprediction:{1}\nGround Truth{2}".format(
-                question[idx],
-                prediction_answers[idx],
-                real_answers[idx]),
-                        color=("green" if prediction_answers[idx]==real_answers[idx] else "red"))
+            ax.set_title("question: {0}\nprediction: {1}\nGround Truth: {2}".format(
+                question[data_locations[idx]],
+                prediction_answers[data_locations[idx]],
+                real_answers[data_locations[idx]]),
+                        color=("green" if prediction_answers[data_locations[idx]]==real_answers[data_locations[idx]] else "red"),
+                        pad=10)
 
         writer.add_figure('predictions vs. actuals',
                             fig,
