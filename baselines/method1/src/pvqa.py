@@ -15,6 +15,9 @@ from param import args
 from pretrain.qa_answer_table import load_lxmert_qa
 from tasks.pvqa_model import PVQAModel
 from tasks.pvqa_data import PVQADataset, PVQATorchDataset, PVQAEvaluator
+from PIL import Image
+import matplotlib.pyplot as plt
+import numpy as np
 baseUrl = 'drive/MyDrive/PathVQA'
 checkpoint_dir = baseUrl+"/checkpoint_LXRT.pth"
 load_dir = baseUrl+"/checkpoint"
@@ -150,7 +153,7 @@ class PVQA:
                 # /////////////////////////////////////////// #new
                 running_loss += loss.item()
 
-                if i % 100 == 99:    # every 1000 mini-batches...
+                if i % 100 == 99:    # every 100 mini-batches...
 
                     # ...log the running loss
                     writer.add_scalar('training loss',
@@ -160,10 +163,11 @@ class PVQA:
 
                     # ...log the validation loss
                     if self.valid_tuple is not None:
-                        valid_score = self.evaluate(eval_tuple)
+                        valid_score = self.evaluate(eval_tuple,None,True,epoch * len(loader) + i)
                         writer.add_scalar('validation loss',
                                           valid_score,
                                           epoch * len(loader) + i)   # x-axis is the number of batches
+
                 # //////////////////////////////////////////
 
                 nn.utils.clip_grad_norm_(self.model.parameters(), 5.)
@@ -203,7 +207,7 @@ class PVQA:
 
         self.save("LAST")
 
-    def predict(self, eval_tuple: DataTuple, dump=None):
+    def predict(self, eval_tuple: DataTuple, dump=None, writeExamples = False,step=0):
         """
         Predict the answers to questions in a data split.
 
@@ -229,16 +233,23 @@ class PVQA:
                 logit = self.model(feats, boxes, sent,
                                    target_answers, t='qa_woi')
                 score, label = logit.max(1)
+
+                prediction_answers = []
                 for qid, l in zip(ques_id, label.cpu().numpy()):
                     ans = dset.label2ans[l]
+                    prediction_answers.append(ans)
                     quesid2ans[qid.item()] = ans
+                
+                if writeExamples:
+                    self.writeIntermediateExamples(img_id,sent, prediction_answers,target_answers,3)
+
         if dump is not None:
             evaluator.dump_result(quesid2ans, dump)
         return quesid2ans
 
-    def evaluate(self, eval_tuple: DataTuple, dump=None):
+    def evaluate(self, eval_tuple: DataTuple, dump=None,writeExamples = False,step=0):
         """Evaluate all data in data_tuple."""
-        quesid2ans = self.predict(eval_tuple, dump)
+        quesid2ans = self.predict(eval_tuple, dump,writeExamples,step)
         return eval_tuple.evaluator.evaluate(quesid2ans)
 
     @staticmethod
@@ -286,7 +297,42 @@ class PVQA:
             'loss': LOSS,
         }, PATH)
 
+    def matplotlib_imshow(self,img, one_channel=False):
+        if one_channel:
+            img = img.mean(dim=0)
+        img = img / 2 + 0.5     # unnormalize
+        npimg = img.numpy()
+        if one_channel:
+            plt.imshow(npimg, cmap="Greys")
+        else:
+            plt.imshow(np.transpose(npimg, (1, 2, 0)))
 
+    def writeIntermediateExamples(self,images_id,question,prediction_answers,real_answers,num_of_images,step):
+        filePath = 'drive/MyDrive/PathVQA/data/pvqa/images/'
+        images = []
+        for i in range(num_of_images):
+            imgnameParts=images_id[i].split("_")
+            if((imgnameParts[0] not in ["test","train","val"]) or (len(imgnameParts[1])!=4)):
+                print('Wrong image name...')
+            filePath+=imgnameParts[0]+"/"+images_id[i]+".jpg"
+            im = Image.open(filePath)
+            images.append(im)
+
+        fig = plt.figure(figsize=(12, 48))
+        for idx in np.arange(num_of_images):
+            ax = fig.add_subplot(1, num_of_images, idx+1, xticks=[], yticks=[])
+            self.matplotlib_imshow(images[idx], one_channel=True)
+
+            ax.set_title("question: {0}\nprediction:{1}\nGround Truth{2}".format(
+                question[idx],
+                prediction_answers[idx],
+                real_answers[idx]),
+                        color=("green" if prediction_answers[idx]==real_answers[idx] else "red"))
+
+        writer.add_figure('predictions vs. actuals',
+                            fig,
+                            global_step=step)
+        
 if __name__ == '__main__':
 
     pvqa = PVQA()
