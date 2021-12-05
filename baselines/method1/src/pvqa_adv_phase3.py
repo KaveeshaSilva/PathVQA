@@ -287,6 +287,8 @@ class PVQA:
             'saved_full_model_state_dict': self.q_i_model.state_dict(),
             'saved_full_model': self.q_i_model,
             'last_running_loss': LOSS,
+            'model_lxrt': self.q_i_model.lxrt_encoder,
+            'model_lxrt_state_dict': self.q_i_model.lxrt_encoder.state_dict(),
         }, PATH)
 
     def loadModelCheckpoint(self):
