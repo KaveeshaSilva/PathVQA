@@ -3,3 +3,4 @@
 .DS_Store
 data/
 baselines/method1/snap/pretrained/model_LXRT.pth
+baselines/method1/src/rrrrr.txt
