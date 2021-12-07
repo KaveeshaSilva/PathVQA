@@ -22,7 +22,8 @@ baseUrl = 'drive/MyDrive/PathVQA'
 checkpoint_dir = baseUrl+"/checkpoint_LXRT.pth"
 load_dir = baseUrl+"/checkpoint"
 temp_checkpoint_save_dir = baseUrl+"/checkpoint_with_LXRT.pth"
-new_checkpoint_save_dir = baseUrl+"/checkpoint_new_LXRT.pth"
+adv_checkpoint_save_dir = baseUrl+"/checkpoint_new_LXRT.pth"
+phase3_checkpoint_save_dir = baseUrl+"/checkpoint_phase3.pth"
 
 
 startFrom = 'B'  # M - middle ,   B - beginning
@@ -62,7 +63,7 @@ class PVQA:
 
         # Model
         self.model = PVQAModel(self.train_tuple.dataset.num_answers)
-        self.model.lxrt_encoder = self.loadModelCheckpoint()['model_lxrt']
+        self.model.lxrt_encoder = self.loadAdvCheckpoint()['model_lxrt']
         # Load pre-trained weights
         # if args.load_lxmert is not None:
         #     print(args.load_lxmert)
@@ -95,7 +96,10 @@ class PVQA:
                                   warmup=0.1,
                                   t_total=t_total)
         else:
-            self.optim = args.optimizer(self.model.parameters(), args.lr)
+            if(startFrom == 'B'):
+                self.optim = args.optimizer(self.model.parameters(), args.lr)
+            else:
+                self.optim = self.loadPhase3Checkpoint['saved_optimizer']
 
         # Output Directory
         self.output = args.output
@@ -113,9 +117,9 @@ class PVQA:
         print('loss and epoch reset')
         if(startFrom == "M"):
             print('loading from saved model..')
-            checkpoint = self.getLastEpoch()
-            lastEpoch = checkpoint['epoch']
-            running_loss = checkpoint['loss']
+            checkpoint = self.loadPhase3Checkpoint()
+            lastEpoch = checkpoint['last_epoch']
+            running_loss = checkpoint['last_running_loss']
             print("last epoch :" + str(lastEpoch))
             print('loss')
             print(running_loss)
@@ -170,7 +174,7 @@ class PVQA:
                     if self.valid_tuple is not None:
                         valid_score = self.evaluate(
                             eval_tuple, None, True, epoch * len(loader) + i)
-                        writer.add_scalar('validation loss',
+                        writer.add_scalar('validation score',
                                           valid_score,
                                           epoch * len(loader) + i)   # x-axis is the number of batches
 
@@ -183,8 +187,10 @@ class PVQA:
                 for qid, l in zip(ques_id, label.cpu().numpy()):
                     ans = dset.label2ans[l]
                     quesid2ans[qid.item()] = ans
-            if(epoch % 10 == 0):
-                self.newSave(epoch, running_loss)  # save model when epoch = 50
+            if(epoch % 3 == 0):
+                self.savePhase3Checkpoint(epoch, running_loss)
+                print('model saved - epoch : ' + str(epoch))
+                # self.newSave(epoch, running_loss)  # save model when epoch = 50
 
             log_str = "\nEpoch- %d: Train %0.2f\n" % (
                 epoch, evaluator.evaluate(quesid2ans) * 100.)
@@ -280,19 +286,26 @@ class PVQA:
         state_dict = torch.load("%s.pth" % path)
         self.model.load_state_dict(state_dict)
 
-    def saveModelCheckpoint(self, EPOCH, LOSS):
-        PATH = new_checkpoint_save_dir
+    def savePhase3Checkpoint(self, EPOCH, LOSS):
+        PATH = phase3_checkpoint_save_dir
         torch.save({
             'last_epoch': EPOCH,
-            'saved_full_model_state_dict': self.q_i_model.state_dict(),
-            'saved_full_model': self.q_i_model,
+            'saved_full_model_state_dict': self.model.state_dict(),
+            'saved_full_model': self.model,
             'last_running_loss': LOSS,
-            'model_lxrt': self.q_i_model.lxrt_encoder,
-            'model_lxrt_state_dict': self.q_i_model.lxrt_encoder.state_dict(),
+            'model_lxrt': self.model.lxrt_encoder,
+            'model_lxrt_state_dict': self.model.lxrt_encoder.state_dict(),
+            'saved_optimizer_state_dict': self.optim.state_dict(),
+            'saved_optimizer': self.optim,
         }, PATH)
 
-    def loadModelCheckpoint(self):
-        PATH = new_checkpoint_save_dir
+    def loadPhase3Checkpoint(self):
+        PATH = phase3_checkpoint_save_dir
+        checkpoint = torch.load(PATH)
+        return checkpoint
+
+    def loadAdvCheckpoint(self):
+        PATH = adv_checkpoint_save_dir
         checkpoint = torch.load(PATH)
         return checkpoint
 
@@ -332,7 +345,7 @@ class PVQA:
 
     def writeIntermediateExamples(self, images_id, question, prediction_answers, real_answers, num_of_images, step):
         filePath = 'drive/MyDrive/PathVQA/data/pvqa/images/'
-        data_locations = [0, 8, 12]
+        data_locations = [0, 5, 15]
         images = []
         for i in range(num_of_images):
             imgnameParts = images_id[data_locations[i]].split("_")
