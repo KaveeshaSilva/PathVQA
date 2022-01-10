@@ -20,17 +20,18 @@ from tasks.pvqa_model_adv import PVQAAdvModel
 from tasks.pvqa_model_adv import Discriminator
 from tasks.pvqa_data import PVQADataset, PVQATorchDataset, PVQAEvaluator
 baseUrl = 'drive/MyDrive/PathVQA'
-checkpoint_dir = baseUrl+"/checkpoint_with_LXRT_1.pth"
-load_dir = baseUrl+"/checkpoint"
-temp_checkpoint_save_dir = baseUrl+"/checkpoint_with_LXRT.pth"
-new_checkpoint_save_dir = baseUrl+"/checkpoint_new_LXRT.pth"
+# checkpoint_dir = baseUrl+"/checkpoint_with_LXRT_1.pth"
+# load_dir = baseUrl+"/checkpoint"
+# temp_checkpoint_save_dir = baseUrl+"/checkpoint_with_LXRT.pth"
+new_checkpoint_save_dir = baseUrl + \
+    "/checkpoint_adv_LXRT_qi_2.pth"  # checkpint_new_LXRT
 adv_model_dir = baseUrl+"/model_qa_all.pth"
 
 startFrom = 'M'  # M - middle ,   B - beginning
 
 # default `log_dir` is "runs" - we'll be more specific here
 print('start writer creating')
-writer = SummaryWriter(baseUrl+'runs/Pathvqa_experiment_adv_new')
+writer = SummaryWriter(baseUrl+'runs/Pathvqa_experiment_adv_new_2')
 print('finished writer creating')
 
 DataTuple = collections.namedtuple("DataTuple", 'dataset loader evaluator')
@@ -376,23 +377,23 @@ class PVQAAdv:
             'last_running_loss_g': LOSS_G,
         }, PATH)
 
-    def getLastEpoch(self):
-        PATH = checkpoint_dir
-        checkpoint = torch.load(PATH)
-        return checkpoint
+    # def getLastEpoch(self):
+    #     PATH = checkpoint_dir
+    #     checkpoint = torch.load(PATH)
+    #     return checkpoint
 
-    def newSave(self, EPOCH, LOSS):
-        # PATH = checkpoint_dir
-        PATH = temp_checkpoint_save_dir
-        torch.save({
-            'epoch': EPOCH,
-            'model_lxrt': self.q_i_model.lxrt_encoder,
-            'model_lxrt_state_dict': self.q_i_model.lxrt_encoder.state_dict(),
-            'model_state_dict': self.q_i_model.state_dict(),
-            'full_model': self.q_i_model,
-            'optimizer_state_dict': self.optimizer_G.state_dict(),
-            'loss': LOSS,
-        }, PATH)
+    # def newSave(self, EPOCH, LOSS):
+    #     # PATH = checkpoint_dir
+    #     PATH = temp_checkpoint_save_dir
+    #     torch.save({
+    #         'epoch': EPOCH,
+    #         'model_lxrt': self.q_i_model.lxrt_encoder,
+    #         'model_lxrt_state_dict': self.q_i_model.lxrt_encoder.state_dict(),
+    #         'model_state_dict': self.q_i_model.state_dict(),
+    #         'full_model': self.q_i_model,
+    #         'optimizer_state_dict': self.optimizer_G.state_dict(),
+    #         'loss': LOSS,
+    #     }, PATH)
 
 
 if __name__ == '__main__':
