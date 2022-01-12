@@ -21,7 +21,7 @@ import numpy as np
 baseUrl = 'drive/MyDrive/PathVQA'
 checkpoint_dir = baseUrl+"/checkpoint_LXRT.pth"
 load_dir = baseUrl+"/checkpoint"
-temp_checkpoint_save_dir = baseUrl+"/checkpoint_with_LXRT.pth"
+temp_checkpoint_save_dir = baseUrl+"/checkpoint_original_model.pth"
 
 startFrom = 'B'  # M - middle ,   B - beginning
 
@@ -140,7 +140,7 @@ class PVQA:
                     target_answers.append(target_ans)
 
                 logit = self.model(feats, boxes, sent,
-                                   target_answers, t='qa_woi')
+                                   target_answers)  # add t='qa_woi'
 
                 assert logit.dim() == target.dim() == 2
 
@@ -163,7 +163,8 @@ class PVQA:
 
                     # ...log the validation loss
                     if self.valid_tuple is not None:
-                        valid_score = self.evaluate(eval_tuple,None,True,epoch * len(loader) + i)
+                        valid_score = self.evaluate(
+                            eval_tuple, None, True, epoch * len(loader) + i)
                         writer.add_scalar('validation loss',
                                           valid_score,
                                           epoch * len(loader) + i)   # x-axis is the number of batches
@@ -177,7 +178,7 @@ class PVQA:
                 for qid, l in zip(ques_id, label.cpu().numpy()):
                     ans = dset.label2ans[l]
                     quesid2ans[qid.item()] = ans
-            if(epoch % 10 == 0):
+            if(epoch % 3 == 0):
                 self.newSave(epoch, running_loss)  # save model when epoch = 50
 
             log_str = "\nEpoch- %d: Train %0.2f\n" % (
@@ -207,7 +208,7 @@ class PVQA:
 
         self.save("LAST")
 
-    def predict(self, eval_tuple: DataTuple, dump=None, writeExamples = False,step=0):
+    def predict(self, eval_tuple: DataTuple, dump=None, writeExamples=False, step=0):
         """
         Predict the answers to questions in a data split.
 
@@ -231,7 +232,7 @@ class PVQA:
                     target_answers.append(target_ans)
 
                 logit = self.model(feats, boxes, sent,
-                                   target_answers, t='qa_woi')
+                                   target_answers)  # add t='qa_woi'
                 score, label = logit.max(1)
 
                 prediction_answers = []
@@ -239,17 +240,18 @@ class PVQA:
                     ans = dset.label2ans[l]
                     prediction_answers.append(ans)
                     quesid2ans[qid.item()] = ans
-                
-                if writeExamples and i==0:
-                    self.writeIntermediateExamples(img_id,sent, prediction_answers,target_answers,3,step)
+
+                if writeExamples and i == 0:
+                    self.writeIntermediateExamples(
+                        img_id, sent, prediction_answers, target_answers, 3, step)
 
         if dump is not None:
             evaluator.dump_result(quesid2ans, dump)
         return quesid2ans
 
-    def evaluate(self, eval_tuple: DataTuple, dump=None,writeExamples = False,step=0):
+    def evaluate(self, eval_tuple: DataTuple, dump=None, writeExamples=False, step=0):
         """Evaluate all data in data_tuple."""
-        quesid2ans = self.predict(eval_tuple, dump,writeExamples,step)
+        quesid2ans = self.predict(eval_tuple, dump, writeExamples, step)
         return eval_tuple.evaluator.evaluate(quesid2ans)
 
     @staticmethod
@@ -297,7 +299,7 @@ class PVQA:
             'loss': LOSS,
         }, PATH)
 
-    def matplotlib_imshow(self,img, one_channel=False):
+    def matplotlib_imshow(self, img, one_channel=False):
         if one_channel:
             img = img.mean(dim=0)
         # img = img / 2 + 0.5     # unnormalize
@@ -307,16 +309,17 @@ class PVQA:
         else:
             plt.imshow(img)
 
-    def writeIntermediateExamples(self,images_id,question,prediction_answers,real_answers,num_of_images,step):
+    def writeIntermediateExamples(self, images_id, question, prediction_answers, real_answers, num_of_images, step):
         filePath = 'drive/MyDrive/PathVQA/data/pvqa/images/'
-        data_locations = [0,5,12]
+        data_locations = [0, 5, 12]
         images = []
         for i in range(num_of_images):
-            imgnameParts=images_id[data_locations[i]].split("_")
-            if((imgnameParts[0] not in ["test","train","val"]) or (len(imgnameParts[1])!=4)):
+            imgnameParts = images_id[data_locations[i]].split("_")
+            if((imgnameParts[0] not in ["test", "train", "val"]) or (len(imgnameParts[1]) != 4)):
                 print('Wrong image name...')
             # filePath+=imgnameParts[0]+"/"+images_id[i]+".jpg"
-            im = mpimg.imread(filePath+imgnameParts[0]+"/"+images_id[data_locations[i]]+".jpg")
+            im = mpimg.imread(
+                filePath+imgnameParts[0]+"/"+images_id[data_locations[i]]+".jpg")
             images.append(im)
 
         fig = plt.figure(figsize=(12, 48))
@@ -328,13 +331,15 @@ class PVQA:
                 question[data_locations[idx]],
                 prediction_answers[data_locations[idx]],
                 real_answers[data_locations[idx]]),
-                        color=("green" if prediction_answers[data_locations[idx]]==real_answers[data_locations[idx]] else "red"),
-                        pad=10)
+                color=("green" if prediction_answers[data_locations[idx]]
+                       == real_answers[data_locations[idx]] else "red"),
+                pad=10)
 
         writer.add_figure('predictions vs. actuals',
-                            fig,
-                            global_step=step)
-        
+                          fig,
+                          global_step=step)
+
+
 if __name__ == '__main__':
 
     pvqa = PVQA()
