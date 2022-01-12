@@ -71,7 +71,7 @@ class PVQAAdv:
         checkpoint = None
         if(startFrom == 'B'):
             self.q_i_model = PVQAAdvModel(
-                self.train_tuple.dataset.num_answers).lxrt_encoder
+                self.train_tuple.dataset.num_answers)
             self.discriminator = Discriminator()
 
         else:
@@ -89,7 +89,7 @@ class PVQAAdv:
         if(startFrom == 'B'):
             # Load pre-trained weights
             if args.load_lxmert is not None:
-                print(args.load_lxmert)
+                print('load model from : '+str(args.load_lxmert)+'\n')
                 self.q_i_model.lxrt_encoder.load(args.load_lxmert)
                 # self.q_a_model.lxrt_encoder.load(args.load_lxmert)
 
