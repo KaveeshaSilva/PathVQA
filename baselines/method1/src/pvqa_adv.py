@@ -27,7 +27,7 @@ new_checkpoint_save_dir = baseUrl + \
     "/checkpoint_adv_LXRT_qi_2.pth"  # checkpint_new_LXRT
 adv_model_dir = baseUrl+"/model_qa_all.pth"
 
-startFrom = 'M'  # M - middle ,   B - beginning
+startFrom = 'B'  # M - middle ,   B - beginning
 
 # default `log_dir` is "runs" - we'll be more specific here
 print('start writer creating')
@@ -70,7 +70,8 @@ class PVQAAdv:
         # Model
         checkpoint = None
         if(startFrom == 'B'):
-            self.q_i_model = PVQAAdvModel(self.train_tuple.dataset.num_answers)
+            self.q_i_model = PVQAAdvModel(
+                self.train_tuple.dataset.num_answers).lxrt_encoder
             self.discriminator = Discriminator()
 
         else:
@@ -120,7 +121,7 @@ class PVQAAdv:
             # self.optim = args.optimizer(self.model.parameters(), args.lr)
         if(startFrom == 'B'):
             self.optimizer_G = torch.optim.Adam(
-                self.q_i_model.parameters(), lr=0.0002, betas=(0.5, 0.999))
+                self.q_i_model.lxrt_encoder.parameters(), lr=0.0002, betas=(0.5, 0.999))
             self.optimizer_D = torch.optim.Adam(
                 self.discriminator.parameters(), lr=0.0002, betas=(0.5, 0.999))
         else:
@@ -196,7 +197,6 @@ class PVQAAdv:
                     feats, boxes, sent, target_answers, t='qa_woi')  # answer from trained model
 
                 assert q_i_embeeeding.dim() == q_a_embeeeding.dim()
-                print("q_a_embeeeding.dim() :" + str(q_a_embeeeding.dim()))
 
                 dis_output_q_i = self.discriminator(q_i_embeeeding)
 
