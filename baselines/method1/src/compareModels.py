@@ -4,6 +4,7 @@ from tasks.pvqa_model_adv import PVQAAdvModel
 baseUrl = 'drive/MyDrive/PathVQA'
 new_checkpoint_save_dir = baseUrl + \
     "/checkpoint_adv_LXRT_qi_2.pth"  # checkpint_new_LXRT
+original_checkpoint_save_dir = baseUrl+"/checkpoint_original_model.pth"
 
 
 def compareModelWeights(model_a, model_b):
@@ -34,7 +35,7 @@ def compareModelWeights(model_a, model_b):
 
 
 def loadQAModel():
-    PATH = new_checkpoint_save_dir
+    PATH = original_checkpoint_save_dir
     checkpoint = torch.load(PATH)
     return checkpoint
 
