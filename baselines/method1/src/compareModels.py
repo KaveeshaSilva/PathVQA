@@ -35,7 +35,7 @@ def compareModelWeights(model_a, model_b):
 
 
 def loadQAModel():
-    PATH = original_checkpoint_save_dir
+    PATH = new_checkpoint_save_dir
     checkpoint = torch.load(PATH)
     return checkpoint
 
