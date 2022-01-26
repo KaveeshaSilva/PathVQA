@@ -152,10 +152,6 @@ class PVQAAdv:
             running_loss_g = checkpoint['last_running_loss_g']
             running_loss_d = checkpoint['last_running_loss_d']
             print("last epoch :" + str(lastEpoch))
-            print('loss g')
-            print(running_loss_g)
-            print('loss d')
-            print(running_loss_d)
 
         start_epoch = lastEpoch + 1  # new
 
@@ -176,7 +172,7 @@ class PVQAAdv:
                 fake = Variable(Tensor(32, 1).fill_(0.0),  # 32 is the batch size
                                 requires_grad=False)
 
-                self.q_i_model.train()
+                self.q_i_model.lxrt_encoder.train()
 
                 # -----------------
                 #  Train Generator
@@ -203,6 +199,7 @@ class PVQAAdv:
                 # Loss measures generator's ability to fool the discriminator
                 g_loss = self.adversarial_loss(dis_output_q_i, valid)
                 g_loss.backward()
+                nn.utils.clip_grad_norm_(self.q_i_model.parameters(), 5.)
                 self.optimizer_G.step()
 
                 # ---------------------
