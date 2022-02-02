@@ -11,12 +11,13 @@ import torch.nn as nn
 from torch.utils.data import DataLoader
 
 from param import args
-from pretrain.lxmert_data import InputExample, LXMERTDataset, LXMERTTorchDataset, LXMERTEvaluator
+from lxmert_data import InputExample, LXMERTDataset, LXMERTTorchDataset, LXMERTEvaluator
 from lxrt.entry import set_visual_config
 from lxrt.tokenization import BertTokenizer
 from lxrt.modeling import LXRTPretraining
 
-DataTuple = collections.namedtuple("DataTuple", 'dataset torchdset loader evaluator')
+DataTuple = collections.namedtuple(
+    "DataTuple", 'dataset torchdset loader evaluator')
 
 
 def get_tuple(splits: str, bs: int, shuffle=False, drop_last=False, topk=-1) -> DataTuple:
@@ -42,10 +43,12 @@ def get_tuple(splits: str, bs: int, shuffle=False, drop_last=False, topk=-1) -> 
     return DataTuple(dataset=dset, torchdset=tset, loader=data_loader, evaluator=evaluator)
 
 
-train_tuple = get_tuple(args.train, args.batch_size, shuffle=True, drop_last=True)
+train_tuple = get_tuple(args.train, args.batch_size,
+                        shuffle=True, drop_last=True)
 # valid_batch_size = 2048 if args.multiGPU else 512
 valid_batch_size = 1024 if args.multiGPU else 256
-valid_tuple = get_tuple(args.valid, valid_batch_size, shuffle=False, drop_last=False, topk=5000)
+valid_tuple = get_tuple(args.valid, valid_batch_size,
+                        shuffle=False, drop_last=False, topk=5000)
 
 
 class InputFeatures(object):
@@ -211,7 +214,8 @@ def convert_example_to_features(example: InputExample, max_seq_length, tokenizer
     # Ge random words
     masked_tokens, masked_label = random_word(tokens, tokenizer)
     if tokens_rps is not None:
-        masked_tokens_rps, masked_label_rps = random_word(tokens_rps, tokenizer)
+        masked_tokens_rps, masked_label_rps = random_word(
+            tokens_rps, tokenizer)
     else:
         masked_tokens_rps, masked_label_rps = None, None
     if tokens_a is not None:
@@ -219,7 +223,8 @@ def convert_example_to_features(example: InputExample, max_seq_length, tokenizer
     else:
         masked_tokens_a, masked_label_a = None, None
     if tokens_a_rps is not None:
-        masked_tokens_a_rps, masked_label_a_rps = random_word(tokens_a_rps, tokenizer)
+        masked_tokens_a_rps, masked_label_a_rps = random_word(
+            tokens_a_rps, tokenizer)
     else:
         masked_tokens_a_rps, masked_label_a_rps = None, None
 
@@ -317,7 +322,7 @@ def convert_example_to_features(example: InputExample, max_seq_length, tokenizer
     # QA answer label
     if example.label is None or len(example.label) == 0:
         # 1. No label 2. Label is pruned 3. unmatched visual + language pair
-        
+
         ans = -1
     else:
         keys, values = zip(*example.label.items())
@@ -332,7 +337,7 @@ def convert_example_to_features(example: InputExample, max_seq_length, tokenizer
     # QA answer label RePlaced
     if example.replace_label is None or len(example.replace_label) == 0:
         # 1. No label 2. Label is pruned 3. unmatched visual + language pair
-        
+
         replace_ans = -1
     else:
         keys, values = zip(*example.replace_label.items())
@@ -465,31 +470,49 @@ class LXMERT:
                           for example in examples]
 
         # language Inputs
-        input_ids = torch.tensor([f.input_ids for f in train_features], dtype=torch.long).cuda()
-        input_mask = torch.tensor([f.input_mask for f in train_features], dtype=torch.long).cuda()
-        segment_ids = torch.tensor([f.segment_ids for f in train_features], dtype=torch.long).cuda()
+        input_ids = torch.tensor(
+            [f.input_ids for f in train_features], dtype=torch.long).cuda()
+        input_mask = torch.tensor(
+            [f.input_mask for f in train_features], dtype=torch.long).cuda()
+        segment_ids = torch.tensor(
+            [f.segment_ids for f in train_features], dtype=torch.long).cuda()
 
-        input_ids_rps = torch.tensor([f.input_ids_rps for f in train_features], dtype=torch.long).cuda()
-        input_mask_rps = torch.tensor([f.input_mask_rps for f in train_features], dtype=torch.long).cuda()
-        segment_ids_rps = torch.tensor([f.segment_ids_rps for f in train_features], dtype=torch.long).cuda()
+        input_ids_rps = torch.tensor(
+            [f.input_ids_rps for f in train_features], dtype=torch.long).cuda()
+        input_mask_rps = torch.tensor(
+            [f.input_mask_rps for f in train_features], dtype=torch.long).cuda()
+        segment_ids_rps = torch.tensor(
+            [f.segment_ids_rps for f in train_features], dtype=torch.long).cuda()
 
-        input_ids_a = torch.tensor([f.input_ids_a for f in train_features], dtype=torch.long).cuda()
-        input_mask_a = torch.tensor([f.input_mask_a for f in train_features], dtype=torch.long).cuda()
-        segment_ids_a = torch.tensor([f.segment_ids_a for f in train_features], dtype=torch.long).cuda()
+        input_ids_a = torch.tensor(
+            [f.input_ids_a for f in train_features], dtype=torch.long).cuda()
+        input_mask_a = torch.tensor(
+            [f.input_mask_a for f in train_features], dtype=torch.long).cuda()
+        segment_ids_a = torch.tensor(
+            [f.segment_ids_a for f in train_features], dtype=torch.long).cuda()
 
-        input_ids_a_rps = torch.tensor([f.input_ids_a_rps for f in train_features], dtype=torch.long).cuda()
-        input_mask_a_rps = torch.tensor([f.input_mask_a_rps for f in train_features], dtype=torch.long).cuda()
-        segment_ids_a_rps = torch.tensor([f.segment_ids_a_rps for f in train_features], dtype=torch.long).cuda()
+        input_ids_a_rps = torch.tensor(
+            [f.input_ids_a_rps for f in train_features], dtype=torch.long).cuda()
+        input_mask_a_rps = torch.tensor(
+            [f.input_mask_a_rps for f in train_features], dtype=torch.long).cuda()
+        segment_ids_a_rps = torch.tensor(
+            [f.segment_ids_a_rps for f in train_features], dtype=torch.long).cuda()
 
         # Visual Inputs
-        feats = torch.from_numpy(np.stack([f.visual_feats[0] for f in train_features])).cuda()
-        pos = torch.from_numpy(np.stack([f.visual_feats[1] for f in train_features])).cuda()
+        feats = torch.from_numpy(
+            np.stack([f.visual_feats[0] for f in train_features])).cuda()
+        pos = torch.from_numpy(
+            np.stack([f.visual_feats[1] for f in train_features])).cuda()
 
         # Language Prediction
-        lm_labels = torch.tensor([f.lm_label_ids for f in train_features], dtype=torch.long).cuda()
-        lm_labels_rps = torch.tensor([f.lm_label_ids_rps for f in train_features], dtype=torch.long).cuda()
-        lm_labels_a = torch.tensor([f.lm_label_ids_a for f in train_features], dtype=torch.long).cuda()
-        lm_labels_a_rps = torch.tensor([f.lm_label_ids_a_rps for f in train_features], dtype=torch.long).cuda()
+        lm_labels = torch.tensor(
+            [f.lm_label_ids for f in train_features], dtype=torch.long).cuda()
+        lm_labels_rps = torch.tensor(
+            [f.lm_label_ids_rps for f in train_features], dtype=torch.long).cuda()
+        lm_labels_a = torch.tensor(
+            [f.lm_label_ids_a for f in train_features], dtype=torch.long).cuda()
+        lm_labels_a_rps = torch.tensor(
+            [f.lm_label_ids_a_rps for f in train_features], dtype=torch.long).cuda()
 
         # Visual Prediction
         obj_labels = {}
@@ -498,18 +521,27 @@ class LXMERT:
                 visn_labels = None
                 visn_mask = None
             else:
-                visn_labels = torch.from_numpy(np.stack([f.obj_labels[key][0] for f in train_features])).cuda()
-                visn_mask = torch.from_numpy(np.stack([f.obj_labels[key][1] for f in train_features])).cuda()
-                assert visn_labels.size(0) == visn_mask.size(0) and visn_labels.size(1) == visn_mask.size(1)
+                visn_labels = torch.from_numpy(
+                    np.stack([f.obj_labels[key][0] for f in train_features])).cuda()
+                visn_mask = torch.from_numpy(
+                    np.stack([f.obj_labels[key][1] for f in train_features])).cuda()
+                assert visn_labels.size(0) == visn_mask.size(
+                    0) and visn_labels.size(1) == visn_mask.size(1)
             obj_labels[key] = (visn_labels, visn_mask)
 
         # Joint Prediction
-        matched_labels = torch.tensor([f.is_matched for f in train_features], dtype=torch.long).cuda()
-        matched_labels_ans = torch.tensor([f.ans_matched for f in train_features], dtype=torch.long).cuda()
-        ans = torch.from_numpy(np.stack([f.ans for f in train_features])).cuda()
-        replace_ans = torch.from_numpy(np.stack([f.replace_ans for f in train_features])).cuda()
-        ans_types = torch.tensor([f.ans_type for f in train_features], dtype=torch.long).cuda()
-        ans_rps_types = torch.tensor([f.ans_rps_type for f in train_features], dtype=torch.long).cuda()
+        matched_labels = torch.tensor(
+            [f.is_matched for f in train_features], dtype=torch.long).cuda()
+        matched_labels_ans = torch.tensor(
+            [f.ans_matched for f in train_features], dtype=torch.long).cuda()
+        ans = torch.from_numpy(
+            np.stack([f.ans for f in train_features])).cuda()
+        replace_ans = torch.from_numpy(
+            np.stack([f.replace_ans for f in train_features])).cuda()
+        ans_types = torch.tensor(
+            [f.ans_type for f in train_features], dtype=torch.long).cuda()
+        ans_rps_types = torch.tensor(
+            [f.ans_rps_type for f in train_features], dtype=torch.long).cuda()
 
         """
         forward(self, input_ids, token_type_ids=None, attention_mask=None, masked_lm_labels=None,
@@ -558,7 +590,8 @@ class LXMERT:
         print("Batch per epoch: %d" % batch_per_epoch)
         print("Total Iters: %d" % t_total)
         print("Warm up Iters: %d" % warmup_iters)
-        optim = BertAdam(self.model.parameters(), lr=args.lr, warmup=warmup_ratio, t_total=t_total)
+        optim = BertAdam(self.model.parameters(), lr=args.lr,
+                         warmup=warmup_ratio, t_total=t_total)
 
         # Train
         best_eval_loss = 9595.
@@ -587,7 +620,8 @@ class LXMERT:
                         ans = train_tuple.dataset.answer_table.id2ans(l)
                         uid2ans[uid] = ans
 
-            print("The training loss for Epoch %d is %0.4f" % (epoch, total_loss / batch_per_epoch))
+            print("The training loss for Epoch %d is %0.4f" %
+                  (epoch, total_loss / batch_per_epoch))
             losses_str = "The losses are "
             # for name, loss in zip(LOSSES_NAME, total_losses):
             #   losses_str += "%s: %0.4f " % (name, loss / batch_per_epoch)
