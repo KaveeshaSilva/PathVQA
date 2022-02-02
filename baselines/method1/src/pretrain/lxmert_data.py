@@ -7,7 +7,7 @@ import numpy as np
 from torch.utils.data import Dataset
 
 from param import args
-from pretrain.qa_answer_table import AnswerTable
+from qa_answer_table import AnswerTable
 from utils import load_obj_tsv
 
 TINY_IMG_NUM = 500
@@ -64,7 +64,8 @@ class LXMERTDataset:
 
         # Create answer table according to the qa_sets
         self.answer_table = AnswerTable(qa_sets)
-        print("Load an answer table of size %d." % (len(self.answer_table.ans2id_map())))
+        print("Load an answer table of size %d." %
+              (len(self.answer_table.ans2id_map())))
 
         # Modify the answers
         for datum in self.data:
@@ -170,10 +171,14 @@ class LXMERTTorchDataset(Dataset):
         obj_num = img_info['num_boxes']
         feats = img_info['features'].copy()
         boxes = img_info['boxes'].copy()
-        obj_labels = img_info['objects_id'].copy() if 'objects_id' in img_info else None
-        obj_confs = img_info['objects_conf'].copy() if 'objects_conf' in img_info else None
-        attr_labels = img_info['attrs_id'].copy() if 'attrs_id' in img_info else None
-        attr_confs = img_info['attrs_conf'].copy() if 'attrs_conf' in img_info else None
+        obj_labels = img_info['objects_id'].copy(
+        ) if 'objects_id' in img_info else None
+        obj_confs = img_info['objects_conf'].copy(
+        ) if 'objects_conf' in img_info else None
+        attr_labels = img_info['attrs_id'].copy(
+        ) if 'attrs_id' in img_info else None
+        attr_confs = img_info['attrs_conf'].copy(
+        ) if 'attrs_conf' in img_info else None
         assert obj_num == len(boxes) == len(feats)
 
         # Normalize the boxes (to 0 ~ 1)
@@ -194,7 +199,8 @@ class LXMERTTorchDataset(Dataset):
                 is_matched = 0
                 other_datum = self.data[random.randint(0, len(self.data) - 1)]
                 while other_datum['img_id'] == img_id:
-                    other_datum = self.data[random.randint(0, len(self.data) - 1)]
+                    other_datum = self.data[random.randint(
+                        0, len(self.data) - 1)]
                 replace_sent = other_datum['sent']
 
         answer = None
@@ -202,7 +208,8 @@ class LXMERTTorchDataset(Dataset):
         if 'label' in datum:
             label = datum['label'].copy()
             for ans in list(label.keys()):
-                label[self.raw_dataset.answer_table.ans2id(ans)] = label.pop(ans)
+                label[self.raw_dataset.answer_table.ans2id(
+                    ans)] = label.pop(ans)
                 answer = ans
 
         else:
@@ -216,11 +223,13 @@ class LXMERTTorchDataset(Dataset):
                 ans_matched = 0
                 other_datum = self.data[random.randint(0, len(self.data) - 1)]
                 while other_datum['img_id'] == img_id:
-                    other_datum = self.data[random.randint(0, len(self.data) - 1)]
+                    other_datum = self.data[random.randint(
+                        0, len(self.data) - 1)]
                 if 'label' in datum:
                     replace_label = datum['label'].copy()
                     for ans in list(replace_label.keys()):
-                        replace_label[self.raw_dataset.answer_table.ans2id(ans)] = replace_label.pop(ans)
+                        replace_label[self.raw_dataset.answer_table.ans2id(
+                            ans)] = replace_label.pop(ans)
                         replace_answer = ans
         # print(label,sent,answer)
         # Create target
