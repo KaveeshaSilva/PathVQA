@@ -1,4 +1,5 @@
-imgv=
+imgv=1
+baseUrl=drive/MyDrive/PathVQA
 dir=qa_vq_va_vqa_imgv${imgv}
 echo $dir
 
@@ -9,17 +10,17 @@ do
   pre_name=lxmert_pvqa_pre_from_pretrained_${dir}_${seed}
 
   # Create dirs and make backup
-  pre_output=snap/pretrain/$pre_name
+  pre_output=${baseUrl}/baselines/method1/snap/pretrain/$pre_name
   mkdir -p $pre_output
 
   # Pre-trainin
   PYTHONPATH=$PYTHONPATH:./src \
-      python src/pretrain/lxmert_pretrain.py \
+      python ${baseUrl}/baselines/method1/src/pretrain/lxmert_pretrain.py \
       --taskQA_woi --taskVA2 --taskMatched --taskQA \
       --visualLosses obj,attr,feat \
       --wordMaskRate 0.15 --objMaskRate 0.15 \
       --train  pvqa_train --valid pvqa_val \
-      --loadLXMERT snap/pretrained/model \
+      --loadLXMERT ${baseUrl}/baselines/method1/snap/pretrained/model \
       --llayers 9 --xlayers 5 --rlayers 5 \
       --batchSize 16 --optim bert --lr 1e-4 --epochs 2 \
       --seed $seed --pvqaimgv $imgv \
@@ -28,12 +29,12 @@ do
   ft_name=pvqa_pre_from_pretrained_${dir}_${seed}_lxr955 # pvqa_pre
 
   # Save logs and models under snap/vqa; make backup.
-  ft_output=snap/pvqa/$ft_name
+  ft_output=${baseUrl}/baselines/method1/snap/pvqa/$ft_name
   mkdir -p $ft_output
 
   # See Readme.md for option details.
   CUDA_VISIBLE_DEVICES=0 PYTHONPATH=$PYTHONPATH:./src \
-      python src/tasks/pvqa.py \
+      python ${baseUrl}/baselines/method1/src/tasks/pvqa.py \
       --train train --valid val  \
       --llayers 9 --xlayers 5 --rlayers 5 \
       --loadLXMERT ${pre_output}/Epoch01 \
@@ -45,12 +46,12 @@ do
   res_name=pvqa_pre_from_pretrained_${dir}_${seed}_lxr955_results
 
   # Save logs and models under snap/vqa; make backup.
-  res_output=snap/pvqa/$res_name
+  res_output=${baseUrl}/baselines/method1/snap/pvqa/$res_name
   mkdir -p $res_output
 
   # See Readme.md for option details.
   CUDA_VISIBLE_DEVICES=0 PYTHONPATH=$PYTHONPATH:./src \
-      python src/tasks/pvqa.py \
+      python ${baseUrl}/baselines/method1/src/tasks/pvqa.py \
       --test test  --train val --valid "" \
       --load ${ft_output}/BEST \
       --llayers 9 --xlayers 5 --rlayers 5 \
