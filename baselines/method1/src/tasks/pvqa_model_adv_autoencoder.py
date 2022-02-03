@@ -22,7 +22,7 @@ class PVQAAdvModel(nn.Module):
         )
 
         self.encoder = nn.Sequential(
-            nn.Linear(784, 512),
+            nn.Linear(768, 512),
             nn.ReLU(),
             nn.Linear(512, 512),
             nn.ReLU(),
@@ -42,7 +42,7 @@ class PVQAAdvModel(nn.Module):
             nn.ReLU(),
             nn.Linear(512, 512),
             nn.ReLU(),
-            nn.Linear(512, 784)
+            nn.Linear(512, 768)
         )
         # hid_dim = self.lxrt_encoder.dim
 
