@@ -38,7 +38,7 @@ class PVQAAdvModel(nn.Module):
             nn.ReLU(),
             nn.Linear(256, 256),
             nn.ReLU(),
-            nn.Linear(256, 515),
+            nn.Linear(256, 512),
             nn.ReLU(),
             nn.Linear(512, 512),
             nn.ReLU(),
