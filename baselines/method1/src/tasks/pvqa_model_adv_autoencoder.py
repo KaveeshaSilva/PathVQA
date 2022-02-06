@@ -25,13 +25,9 @@ class PVQAAdvModel(nn.Module):
             nn.Linear(768, 512),
             nn.ReLU(),
             nn.Linear(512, 512),
-            nn.ReLU(),
-            nn.Linear(512, 256)
         )
 
         self.decoder = nn.Sequential(
-            nn.Linear(256, 512),
-            nn.ReLU(),
             nn.Linear(512, 512),
             nn.ReLU(),
             nn.Linear(512, 768)
@@ -63,7 +59,7 @@ class PVQAAdvModel(nn.Module):
         encoded = self.encoder(x)
         decoded = self.decoder(encoded)
 
-        return decoded
+        return decoded,x
 
 
 class Discriminator(nn.Module):
