@@ -145,6 +145,7 @@ class PVQAAdv:
         lastEpoch = -1
         running_loss_g = 0
         running_loss_d = 0
+        running_loss_g_lxmert = 0
         # print('loss and epoch reset')
         if(startFrom == "M"):
             print('loading from saved model..')
@@ -152,6 +153,7 @@ class PVQAAdv:
             lastEpoch = checkpoint['last_epoch']
             running_loss_g = checkpoint['last_running_loss_g']
             running_loss_d = checkpoint['last_running_loss_d']
+            running_loss_g_lxmert = checkpoint['last_running_loss_g_lxmert']
             print("last epoch :" + str(lastEpoch))
 
         start_epoch = lastEpoch + 1  # new
@@ -270,7 +272,8 @@ class PVQAAdv:
             if(epoch % 3 == 0):
                 # save model when epoch = 50
                 print('checkpoint saved.  epoch : ' + str(epoch))
-                self.saveModelCheckpoint(epoch, running_loss_g, running_loss_d)
+                self.saveModelCheckpoint(
+                    epoch, running_loss_g, running_loss_d, running_loss_g_lxmert)
             # log_str = "\nEpoch- %d: Train %0.2f\n" % (
             #     epoch, evaluator.evaluate(quesid2ans) * 100.)
 
@@ -369,7 +372,7 @@ class PVQAAdv:
         checkpoint = torch.load(PATH)
         return checkpoint
 
-    def saveModelCheckpoint(self, EPOCH, LOSS_G, LOSS_D):
+    def saveModelCheckpoint(self, EPOCH, LOSS_G, LOSS_D, LOSS_LXMERT):
         PATH = new_checkpoint_save_dir
         torch.save({
             'last_epoch': EPOCH,
@@ -385,6 +388,7 @@ class PVQAAdv:
             'saved_optimizer_D': self.optimizer_D,
             'last_running_loss_d': LOSS_D,
             'last_running_loss_g': LOSS_G,
+            'last_running_loss_g_lxmert': LOSS_LXMERT
         }, PATH)
 
     # def getLastEpoch(self):
