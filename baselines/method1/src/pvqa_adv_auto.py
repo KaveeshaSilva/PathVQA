@@ -267,7 +267,7 @@ class PVQAAdv:
                 # for qid, l in zip(ques_id, label.cpu().numpy()):
                 #     ans = dset.label2ans[l]
                 #     quesid2ans[qid.item()] = ans
-            if(epoch % 5 == 0):
+            if(epoch % 3 == 0):
                 # save model when epoch = 50
                 print('checkpoint saved.  epoch : ' + str(epoch))
                 self.saveModelCheckpoint(epoch, running_loss_g, running_loss_d)
