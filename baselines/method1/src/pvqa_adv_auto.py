@@ -187,7 +187,7 @@ class PVQAAdv:
                     target_ans = dset.label2ans[target_label]
                     target_answers.append(target_ans)
 
-                q_i_embeeeding = self.q_i_model(
+                q_i_embeeeding, lxmert_q_i_embedding = self.q_i_model(
                     feats, boxes, sent, target_answers)
                 q_a_embeeeding = self.q_a_model(
                     feats, boxes, sent, target_answers, t='qa_woi')  # answer from trained model
@@ -195,8 +195,12 @@ class PVQAAdv:
                 assert q_i_embeeeding.dim() == q_a_embeeeding.dim()
 
                 dis_output_q_i = self.discriminator(q_i_embeeeding)
+                dis_output_q_i_lxmert = self.discriminator(lxmert_q_i_embedding)
+                
 
                 # Loss measures generator's ability to fool the discriminator
+                g_loss_lxmert = self.adversarial_loss(dis_output_q_i_lxmert, valid)
+                
                 g_loss = self.adversarial_loss(dis_output_q_i, valid)
                 g_loss.backward()
                 nn.utils.clip_grad_norm_(self.q_i_model.parameters(), 5.)
@@ -224,6 +228,8 @@ class PVQAAdv:
                 # /////////////////////////////////////////// #new
                 running_loss_g += g_loss.item()
                 running_loss_d += d_loss.item()
+                
+                running_loss_g_lxmert += g_loss_lxmert.item()
 
                 if i % 100 == 99:    # every 1000 mini-batches...
 
@@ -237,6 +243,11 @@ class PVQAAdv:
                                       running_loss_d / 100,
                                       epoch * len(loader) + i)
                     running_loss_d = 0
+                    
+                    writer.add_scalar('training g loss lxmert',
+                                      running_loss_g_lxmert / 100,
+                                      epoch * len(loader) + i)
+                    running_loss_g_lxmert = 0
 
                     # ...log the validation loss
                     # if self.valid_tuple is not None:
