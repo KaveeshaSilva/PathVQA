@@ -200,6 +200,11 @@ class PVQAAdv:
                 dis_output_q_i = self.discriminator(q_i_embeeeding)
                 dis_output_q_i_lxmert = self.discriminator(
                     lxmert_q_i_embedding)
+                
+                print("dis_output_q_i_lxmert " + dis_output_q_i_lxmert)
+                print("dis_output_q_i " + dis_output_q_i)
+                print(" ")
+                
 
                 # Loss measures generator's ability to fool the discriminator
                 g_loss_lxmert = self.adversarial_loss(
