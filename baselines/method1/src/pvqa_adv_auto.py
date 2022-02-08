@@ -3,6 +3,7 @@ import re
 from tarfile import NUL
 from torch.utils.tensorboard import SummaryWriter
 import os
+import wandb
 import collections
 
 import torch
@@ -34,6 +35,8 @@ startFrom = 'B'  # M - middle ,   B - beginning
 print('start writer creating')
 writer = SummaryWriter(baseUrl+'runs/adv_with_autoencoder')
 print('finished writer creating')
+wandb.init(project="adv_with_autoencoder_1")
+
 
 DataTuple = collections.namedtuple("DataTuple", 'dataset loader evaluator')
 valid_bs = 256
@@ -200,11 +203,10 @@ class PVQAAdv:
                 dis_output_q_i = self.discriminator(q_i_embeeeding)
                 dis_output_q_i_lxmert = self.discriminator(
                     lxmert_q_i_embedding)
-                
-                print("dis_output_q_i_lxmert " + dis_output_q_i_lxmert)
-                print("dis_output_q_i " + dis_output_q_i)
-                print(" ")
-                
+
+                # print("dis_output_q_i_lxmert " + dis_output_q_i_lxmert)
+                # print("dis_output_q_i " + dis_output_q_i)
+                # print(" ")
 
                 # Loss measures generator's ability to fool the discriminator
                 g_loss_lxmert = self.adversarial_loss(
@@ -241,6 +243,8 @@ class PVQAAdv:
                 running_loss_g_lxmert += g_loss_lxmert.item()
 
                 if i % 100 == 99:    # every 1000 mini-batches...
+                    wandb.log({'training g loss': running_loss_g / 100, 'training d loss': running_loss_d / 100,
+                              'training g loss lxmert': running_loss_g_lxmert / 100}, step=epoch * len(loader) + i)
 
                     # ...log the running loss
                     writer.add_scalar('training g loss',
