@@ -57,7 +57,7 @@ class PVQAAdvModel(nn.Module):
         encoded = self.encoder(x)
         decoded = self.decoder(encoded)
 
-        return decoded,x
+        return decoded, x
 
 
 class Discriminator(nn.Module):
@@ -71,7 +71,11 @@ class Discriminator(nn.Module):
             nn.LeakyReLU(0.2, inplace=True),
             nn.Linear(512, 256),
             nn.LeakyReLU(0.2, inplace=True),
+            nn.Linear(256, 256),
+            nn.LeakyReLU(0.2, inplace=True),
             nn.Linear(256, 128),
+            nn.LeakyReLU(0.2, inplace=True),
+            nn.Linear(128, 128),
             nn.LeakyReLU(0.2, inplace=True),
             nn.Linear(128, 1),
             nn.Sigmoid(),
