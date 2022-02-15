@@ -35,7 +35,7 @@ startFrom = 'B'  # M - middle ,   B - beginning
 print('start writer creating')
 writer = SummaryWriter(baseUrl+'runs/adv_with_autoencoder')
 print('finished writer creating')
-wandb.init(project="adv_with_autoencoder_1")
+wandb.init(project="adv_with_autoencoder_save_full_model_after_autoencoder_reduced")
 
 
 DataTuple = collections.namedtuple("DataTuple", 'dataset loader evaluator')
@@ -82,6 +82,9 @@ class PVQAAdv:
             checkpoint = self.loadModelCheckpoint()
             self.q_i_model = checkpoint['saved_full_model']
             self.discriminator = checkpoint['saved_Discriminator']
+            self.q_i_model.lxrt_encoder = checkpoint['model_lxrt']
+            self.q_i_model.encoder = checkpoint['model_encoder']
+            self.q_i_model.decoder = checkpoint['model_encoder']
 
         self.q_a_model = PVQAAdvModelQA(self.train_tuple.dataset.num_answers)
         # self.q_a_model = self.q_a_full_model.lxrt_encoder
@@ -386,6 +389,8 @@ class PVQAAdv:
         torch.save({
             'last_epoch': EPOCH,
             'model_lxrt': self.q_i_model.lxrt_encoder,
+            'model_encoder': self.q_i_model.encoder,
+            'model_decoder': self.q_i_model.decoder,
             'model_lxrt_state_dict': self.q_i_model.lxrt_encoder.state_dict(),
             'saved_full_model_state_dict': self.q_i_model.state_dict(),
             'saved_full_model': self.q_i_model,
