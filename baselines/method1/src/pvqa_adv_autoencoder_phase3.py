@@ -228,11 +228,13 @@ class PVQA:
                     # self.save("BEST")
                     # self.newSave(epoch, running_loss)
 
-                log_str += "Epoch- %d: Valid %0.2f\n" % (epoch, valid_score * 100.) + \
-                           "Epoch- %d: Best %0.2f\n" % (
-                               epoch, best_valid * 100.)
+                # log_str += "Epoch- %d: Valid %0.2f\n" % (epoch, valid_score * 100.) + \
+                #            "Epoch- %d: Best %0.2f\n" % (
+                #                epoch, best_valid * 100.)
 
-            print(log_str, end='')
+            # print(log_str, end='')
+            print('Epoch : '+str(epoch)+'  training loss: ' +
+                  str(running_loss/100)+'     validation score: '+str(valid_score))
 
             with open(self.output + "/log.log", 'a') as f:
                 print('logged the epoch result')
