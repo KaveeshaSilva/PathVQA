@@ -54,5 +54,6 @@ class PVQAAutoencoderModel(nn.Module):
         # logit = self.logit_fc(x) #answer prediction
         encoded = self.encoder(x)
         decoded = self.decoder(encoded)
-
-        return decoded
+        logit = self.logit_fc(decoded)
+        
+        return logit
