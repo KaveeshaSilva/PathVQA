@@ -97,14 +97,14 @@ class PVQA:
         if args.multiGPU:
             self.model.lxrt_encoder.multi_gpu()
 
-        for param in self.model.lxrt_encoder.parameters():
-            param.requires_grad = False
+#         for param in self.model.lxrt_encoder.parameters():
+#             param.requires_grad = False
 
-        for param in self.model.encoder.parameters():
-            param.requires_grad = False
+#         for param in self.model.encoder.parameters():
+#             param.requires_grad = False
 
-        for param in self.model.decoder.parameters():
-            param.requires_grad = False
+#         for param in self.model.decoder.parameters():
+#             param.requires_grad = False
 
         # Loss and Optimizer
         self.bce_loss = nn.BCEWithLogitsLoss()
