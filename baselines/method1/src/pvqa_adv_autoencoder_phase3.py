@@ -31,7 +31,7 @@ startFrom = 'B'  # M - middle ,   B - beginning
 # default `log_dir` is "runs" - we'll be more specific here
 writer = SummaryWriter(baseUrl+'runs/Pathvqa_experiment_phase3')
 wandb.init(
-    project="phase3_with_autoencoder_save_full_model_after_autoencoder_reduced")
+    project="phase3_with_autoencoder_save_full_model_after_autoencoder_reduced_remove_freeze")
 DataTuple = collections.namedtuple("DataTuple", 'dataset loader evaluator')
 valid_bs = 256
 
