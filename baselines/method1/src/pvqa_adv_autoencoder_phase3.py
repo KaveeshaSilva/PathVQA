@@ -21,9 +21,8 @@ import numpy as np
 baseUrl = 'drive/MyDrive/PathVQA'
 checkpoint_dir = baseUrl+"/checkpoint_LXRT.pth"
 load_dir = baseUrl+"/checkpoint"
-temp_checkpoint_save_dir = baseUrl+"/checkpoint_with_LXRT.pth"
-adv_checkpoint_save_dir = baseUrl+"/checkpoint_new_LXRT.pth"
-phase3_checkpoint_save_dir = baseUrl+"/checkpoint_phase3.pth"
+adv_checkpoint_save_dir = baseUrl+"/checkpoint_adv_with_autoencoder.pth"
+phase3_checkpoint_save_dir = baseUrl+"/checkpoint_phase3_with_autoencoder.pth"
 
 
 startFrom = 'B'  # M - middle ,   B - beginning
@@ -62,11 +61,23 @@ class PVQA:
             self.valid_tuple = None
 
         # Model
-        self.model = PVQAAutoencoderModel(self.train_tuple.dataset.num_answers)
-        self.model.lxrt_encoder = self.loadAdvCheckpoint()['model_lxrt']
-        
-        #load encoder and decoder saved models
-     
+        if(startFrom == 'B'):
+            self.model = PVQAAutoencoderModel(
+                self.train_tuple.dataset.num_answers)
+            checkpoint = self.loadAdvCheckpoint()
+
+            self.model.lxrt_encoder = checkpoint['model_lxrt']
+            self.model.encoder = checkpoint['model_encoder']
+            self.model.decoder = checkpoint['model_decoder']
+
+        if(startFrom == "M"):
+            checkpoint = self.loadPhase3Checkpoint()
+            self.model = checkpoint['saved_full_model']
+            self.model.lxrt_encoder = checkpoint['model_lxrt']
+            self.model.encoder = checkpoint['model_encoder']
+            self.model.decoder = checkpoint['model_encoder']
+        # load encoder and decoder saved models
+
         # Load pre-trained weights
         # if args.load_lxmert is not None:
         #     print(args.load_lxmert)
@@ -86,10 +97,10 @@ class PVQA:
 
         for param in self.model.lxrt_encoder.parameters():
             param.requires_grad = False
-        
+
         for param in self.model.encoder.parameters():
             param.requires_grad = False
-        
+
         for param in self.model.decoder.parameters():
             param.requires_grad = False
 
@@ -303,6 +314,8 @@ class PVQA:
             'saved_full_model': self.model,
             'last_running_loss': LOSS,
             'model_lxrt': self.model.lxrt_encoder,
+            'model_encoder': self.model.encoder,
+            'model_decoder': self.model.decoder,
             'model_lxrt_state_dict': self.model.lxrt_encoder.state_dict(),
             'saved_optimizer_state_dict': self.optim.state_dict(),
             'saved_optimizer': self.optim,
@@ -318,29 +331,29 @@ class PVQA:
         checkpoint = torch.load(PATH)
         return checkpoint
 
-    def newLoadModel(self):
-        PATH = checkpoint_dir
-        checkpoint = torch.load(PATH)
-        self.model.load_state_dict(checkpoint['model_state_dict'])
-        self.optim.load_state_dict(checkpoint['optimizer_state_dict'])
+    # def newLoadModel(self):
+    #     PATH = checkpoint_dir
+    #     checkpoint = torch.load(PATH)
+    #     self.model.load_state_dict(checkpoint['model_state_dict'])
+    #     self.optim.load_state_dict(checkpoint['optimizer_state_dict'])
 
-    def getLastEpoch(self):
-        PATH = checkpoint_dir
-        checkpoint = torch.load(PATH)
-        return checkpoint
+    # def getLastEpoch(self):
+    #     PATH = checkpoint_dir
+    #     checkpoint = torch.load(PATH)
+    #     return checkpoint
 
-    def newSave(self, EPOCH, LOSS):
-        # PATH = checkpoint_dir
-        PATH = temp_checkpoint_save_dir
-        torch.save({
-            'epoch': EPOCH,
-            'model_lxrt': self.model.lxrt_encoder,
-            'model_lxrt_state_dict': self.model.lxrt_encoder.state_dict(),
-            'model_state_dict': self.model.state_dict(),
-            'full_model': self.model,
-            'optimizer_state_dict': self.optim.state_dict(),
-            'loss': LOSS,
-        }, PATH)
+    # def newSave(self, EPOCH, LOSS):
+    #     # PATH = checkpoint_dir
+    #     PATH = temp_checkpoint_save_dir
+    #     torch.save({
+    #         'epoch': EPOCH,
+    #         'model_lxrt': self.model.lxrt_encoder,
+    #         'model_lxrt_state_dict': self.model.lxrt_encoder.state_dict(),
+    #         'model_state_dict': self.model.state_dict(),
+    #         'full_model': self.model,
+    #         'optimizer_state_dict': self.optim.state_dict(),
+    #         'loss': LOSS,
+    #     }, PATH)
 
     def matplotlib_imshow(self, img, one_channel=False):
         if one_channel:
