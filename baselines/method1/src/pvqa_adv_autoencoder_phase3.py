@@ -4,6 +4,7 @@ from tarfile import NUL
 from torch.utils.tensorboard import SummaryWriter
 import os
 import collections
+import wandb
 
 import torch
 import torch.nn as nn
@@ -29,7 +30,8 @@ startFrom = 'B'  # M - middle ,   B - beginning
 
 # default `log_dir` is "runs" - we'll be more specific here
 writer = SummaryWriter(baseUrl+'runs/Pathvqa_experiment_phase3')
-
+wandb.init(
+    project="phase3_with_autoencoder_save_full_model_after_autoencoder_reduced")
 DataTuple = collections.namedtuple("DataTuple", 'dataset loader evaluator')
 valid_bs = 256
 
@@ -183,6 +185,8 @@ class PVQA:
                 running_loss += loss.item()
 
                 if i % 100 == 99:    # every 100 mini-batches...
+                    wandb.log({'training loss': running_loss / 100,
+                              'validation score': valid_score}, step=epoch * len(loader) + i)
 
                     # ...log the running loss
                     writer.add_scalar('training loss',
