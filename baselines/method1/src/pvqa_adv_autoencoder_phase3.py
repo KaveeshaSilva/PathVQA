@@ -185,14 +185,6 @@ class PVQA:
                 running_loss += loss.item()
 
                 if i % 100 == 99:    # every 100 mini-batches...
-                    wandb.log({'training loss': running_loss / 100,
-                              'validation score': valid_score}, step=epoch * len(loader) + i)
-
-                    # ...log the running loss
-                    writer.add_scalar('training loss',
-                                      running_loss / 100,
-                                      epoch * len(loader) + i)
-                    running_loss = 0
 
                     # ...log the validation loss
                     if self.valid_tuple is not None:
@@ -201,6 +193,15 @@ class PVQA:
                         writer.add_scalar('validation score',
                                           valid_score,
                                           epoch * len(loader) + i)   # x-axis is the number of batches
+
+                    wandb.log({'training loss': running_loss / 100,
+                              'validation score': valid_score}, step=epoch * len(loader) + i)
+
+                    # ...log the running loss
+                    writer.add_scalar('training loss',
+                                      running_loss / 100,
+                                      epoch * len(loader) + i)
+                    running_loss = 0
 
                 # //////////////////////////////////////////
 
