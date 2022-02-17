@@ -24,7 +24,7 @@ checkpoint_dir = baseUrl+"/checkpoint_LXRT.pth"
 load_dir = baseUrl+"/checkpoint"
 adv_checkpoint_save_dir = baseUrl+"/checkpoint_adv_with_autoencoder.pth"
 phase3_checkpoint_save_dir = baseUrl + \
-    "/checkpoint_phase3_with_autoencoder_autoencoder_removed_from_p3.pth"
+    "/checkpoint_phase3_with_initial_lxrt_model.pth"
 
 
 startFrom = 'B'  # M - middle ,   B - beginning
@@ -32,7 +32,7 @@ startFrom = 'B'  # M - middle ,   B - beginning
 # default `log_dir` is "runs" - we'll be more specific here
 writer = SummaryWriter(baseUrl+'runs/Pathvqa_experiment_phase3')
 wandb.init(
-    project="phase3_with_autoencoder_save_full_model_after_autoencoder_reduced_remove_freeze_autoencoder_removed_from_p3")
+    project="phase3_with_initial_lxrt_model")
 DataTuple = collections.namedtuple("DataTuple", 'dataset loader evaluator')
 valid_bs = 256
 
@@ -67,7 +67,7 @@ class PVQA:
         if(startFrom == 'B'):
             self.model = PVQAAutoencoderModel(
                 self.train_tuple.dataset.num_answers)
-            checkpoint = self.loadAdvCheckpoint()
+            # checkpoint = self.loadAdvCheckpoint()
 
 #             self.model.lxrt_encoder = checkpoint['model_lxrt']
 #             self.model.encoder = checkpoint['model_encoder']
