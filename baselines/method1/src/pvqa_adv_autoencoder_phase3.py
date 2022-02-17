@@ -24,7 +24,7 @@ checkpoint_dir = baseUrl+"/checkpoint_LXRT.pth"
 load_dir = baseUrl+"/checkpoint"
 adv_checkpoint_save_dir = baseUrl+"/checkpoint_adv_with_autoencoder.pth"
 phase3_checkpoint_save_dir = baseUrl + \
-    "/checkpoint_phase3_with_initial_lxrt_model.pth"
+    "/checkpoint_phase3_with_initial_lxrt_model_without_initial_weights.pth"
 
 
 startFrom = 'B'  # M - middle ,   B - beginning
@@ -32,7 +32,7 @@ startFrom = 'B'  # M - middle ,   B - beginning
 # default `log_dir` is "runs" - we'll be more specific here
 writer = SummaryWriter(baseUrl+'runs/Pathvqa_experiment_phase3')
 wandb.init(
-    project="phase3_with_initial_lxrt_model")
+    project="phase3_with_initial_lxrt_model_without_initial_weights")
 DataTuple = collections.namedtuple("DataTuple", 'dataset loader evaluator')
 valid_bs = 256
 
