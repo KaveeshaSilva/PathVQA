@@ -36,7 +36,7 @@ print('start writer creating')
 writer = SummaryWriter(baseUrl+'runs/adv_with_autoencoder')
 print('finished writer creating')
 
-wandb.init(project="adv_with_autoencoder_discriminator_more_complex_5")
+wandb.init(project="adv_with_autoencoder_discriminator_more_complex_6")
 
 
 DataTuple = collections.namedtuple("DataTuple", 'dataset loader evaluator')
