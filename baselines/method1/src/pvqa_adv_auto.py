@@ -35,6 +35,7 @@ startFrom = 'B'  # M - middle ,   B - beginning
 print('start writer creating')
 writer = SummaryWriter(baseUrl+'runs/adv_with_autoencoder')
 print('finished writer creating')
+
 wandb.init(project="adv_with_autoencoder_discriminator_more_complex_5")
 
 

@@ -87,5 +87,4 @@ class Discriminator(nn.Module):
 
     def forward(self, embedding):
         validity = self.model(embedding)
-
         return validity
