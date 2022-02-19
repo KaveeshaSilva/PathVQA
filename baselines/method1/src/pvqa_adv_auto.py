@@ -26,7 +26,7 @@ baseUrl = 'drive/MyDrive/PathVQA'
 # load_dir = baseUrl+"/checkpoint"
 # temp_checkpoint_save_dir = baseUrl+"/checkpoint_with_LXRT.pth"
 new_checkpoint_save_dir = baseUrl + \
-    "/checkpoint_adv_with_autoencoder.pth"  # checkpint_new_LXRT
+    "/checkpoint_adv_with_autoencoder_discriminator_more_complex.pth"  # checkpint_new_LXRT
 adv_model_dir = baseUrl+"/model_qa_all.pth"
 
 startFrom = 'B'  # M - middle ,   B - beginning
@@ -35,7 +35,7 @@ startFrom = 'B'  # M - middle ,   B - beginning
 print('start writer creating')
 writer = SummaryWriter(baseUrl+'runs/adv_with_autoencoder')
 print('finished writer creating')
-wandb.init(project="adv_with_autoencoder_save_full_model_after_autoencoder_reduced")
+wandb.init(project="adv_with_autoencoder_discriminator_more_complex")
 
 
 DataTuple = collections.namedtuple("DataTuple", 'dataset loader evaluator')
