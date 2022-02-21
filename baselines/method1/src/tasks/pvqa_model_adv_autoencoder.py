@@ -30,6 +30,8 @@ class PVQAAdvModel(nn.Module):
             nn.Linear(1, 768),
             nn.ReLU()
         )
+        self.encoder.apply(self.lxrt_encoder.model.init_bert_weights)
+        self.decoder.apply(self.lxrt_encoder.model.init_bert_weights)
         # hid_dim = self.lxrt_encoder.dim
 
         # VQA Answer heads
@@ -66,8 +68,6 @@ class Discriminator(nn.Module):
 
         self.model = nn.Sequential(
             nn.Linear(768, 512),
-            nn.LeakyReLU(0.2, inplace=True),
-            nn.Linear(512, 512),
             nn.LeakyReLU(0.2, inplace=True),
             nn.Linear(512, 512),
             nn.LeakyReLU(0.2, inplace=True),
