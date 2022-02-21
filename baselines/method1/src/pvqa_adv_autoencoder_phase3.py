@@ -22,9 +22,10 @@ import numpy as np
 baseUrl = 'drive/MyDrive/PathVQA'
 checkpoint_dir = baseUrl+"/checkpoint_LXRT.pth"
 load_dir = baseUrl+"/checkpoint"
-adv_checkpoint_save_dir = baseUrl+"/checkpoint_adv_with_autoencoder.pth"
+adv_checkpoint_save_dir = baseUrl + \
+    "/checkpoint_adv_with_autoencoder_discriminator_more_complex.pth"
 phase3_checkpoint_save_dir = baseUrl + \
-    "/checkpoint_phase3_with_initial_lxrt_model_without_initial_weights.pth"
+    "/checkpoint_phase3_with_initial_lxrt_model_without_phase2_weights_discriminator_more_complex.pth"
 
 
 startFrom = 'B'  # M - middle ,   B - beginning
@@ -32,7 +33,7 @@ startFrom = 'B'  # M - middle ,   B - beginning
 # default `log_dir` is "runs" - we'll be more specific here
 writer = SummaryWriter(baseUrl+'runs/Pathvqa_experiment_phase3')
 wandb.init(
-    project="phase3_with_initial_lxrt_model_without_initial_weights")
+    project="phase3_with_initial_lxrt_model_without_initial_weights_discriminator_more_complex")
 DataTuple = collections.namedtuple("DataTuple", 'dataset loader evaluator')
 valid_bs = 256
 
@@ -67,25 +68,25 @@ class PVQA:
         if(startFrom == 'B'):
             self.model = PVQAAutoencoderModel(
                 self.train_tuple.dataset.num_answers)
-            # checkpoint = self.loadAdvCheckpoint()
+            checkpoint = self.loadAdvCheckpoint()
 
-#             self.model.lxrt_encoder = checkpoint['model_lxrt']
+            self.model.lxrt_encoder = checkpoint['model_lxrt']
 #             self.model.encoder = checkpoint['model_encoder']
 #             self.model.decoder = checkpoint['model_decoder']
 
         if(startFrom == "M"):
             checkpoint = self.loadPhase3Checkpoint()
-#             self.model = checkpoint['saved_full_model']
+            self.model = checkpoint['saved_full_model']
             self.model.lxrt_encoder = checkpoint['model_lxrt']
-#             self.model.encoder = checkpoint['model_encoder']
-#             self.model.decoder = checkpoint['model_encoder']
+            self.model.encoder = checkpoint['model_encoder']
+            self.model.decoder = checkpoint['model_encoder']
         # load encoder and decoder saved models
 
         # Load pre-trained weights
-        if args.load_lxmert is not None:
-            print(args.load_lxmert)
-            if(startFrom == 'B'):
-                self.model.lxrt_encoder.load(args.load_lxmert)
+        # if args.load_lxmert is not None:
+        #     print(args.load_lxmert)
+        #     if(startFrom == 'B'):
+        #         self.model.lxrt_encoder.load(args.load_lxmert)
         #     # else:
         #     #     self.model.lxrt_encoder.load(load_dir)
         # if args.load_lxmert_qa is not None:
@@ -322,8 +323,8 @@ class PVQA:
             'saved_full_model': self.model,
             'last_running_loss': LOSS,
             'model_lxrt': self.model.lxrt_encoder,
-            # 'model_encoder': self.model.encoder,
-            # 'model_decoder': self.model.decoder,
+            'model_encoder': self.model.encoder,
+            'model_decoder': self.model.decoder,
             'model_lxrt_state_dict': self.model.lxrt_encoder.state_dict(),
             'saved_optimizer_state_dict': self.optim.state_dict(),
             'saved_optimizer': self.optim,
