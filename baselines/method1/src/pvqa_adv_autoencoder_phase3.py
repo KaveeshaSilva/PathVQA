@@ -25,7 +25,7 @@ load_dir = baseUrl+"/checkpoint"
 adv_checkpoint_save_dir = baseUrl + \
     "/checkpoint_adv_with_autoencoder_discriminator_more_complex.pth"
 phase3_checkpoint_save_dir = baseUrl + \
-    "/checkpoint_phase3_with_initial_lxrt_model_without_phase2_weights_discriminator_more_complex.pth"
+    "/checkpoint_phase3_with_initial_lxrt_model_without_phase2_weights_discriminator_more_complex_load_phase2_autoencoder.pth"
 
 
 startFrom = 'B'  # M - middle ,   B - beginning
@@ -71,8 +71,8 @@ class PVQA:
             checkpoint = self.loadAdvCheckpoint()
 
             self.model.lxrt_encoder = checkpoint['model_lxrt']
-#             self.model.encoder = checkpoint['model_encoder']
-#             self.model.decoder = checkpoint['model_decoder']
+            self.model.encoder = checkpoint['model_encoder']
+            self.model.decoder = checkpoint['model_decoder']
 
         if(startFrom == "M"):
             checkpoint = self.loadPhase3Checkpoint()
