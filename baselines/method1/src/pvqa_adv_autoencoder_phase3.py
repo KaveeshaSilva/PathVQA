@@ -78,8 +78,9 @@ class PVQA:
             checkpoint = self.loadPhase3Checkpoint()
             self.model = checkpoint['saved_full_model']
             self.model.lxrt_encoder = checkpoint['model_lxrt']
-            self.model.encoder = checkpoint['model_encoder']
-            self.model.decoder = checkpoint['model_encoder']
+            self.model.logit_fc = checkpoint['model_logit_fc']
+            # self.model.encoder = checkpoint['model_encoder']
+            # self.model.decoder = checkpoint['model_encoder']
         # load encoder and decoder saved models
 
 #         Load pre-trained weights
@@ -323,6 +324,7 @@ class PVQA:
             'saved_full_model': self.model,
             'last_running_loss': LOSS,
             'model_lxrt': self.model.lxrt_encoder,
+            'model_logit_fc': self.model.logit_fc,
             # 'model_encoder': self.model.encoder,
             # 'model_decoder': self.model.decoder,
             'model_lxrt_state_dict': self.model.lxrt_encoder.state_dict(),
