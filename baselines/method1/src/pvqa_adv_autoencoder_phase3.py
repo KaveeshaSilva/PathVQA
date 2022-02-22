@@ -33,7 +33,7 @@ startFrom = 'B'  # M - middle ,   B - beginning
 # default `log_dir` is "runs" - we'll be more specific here
 writer = SummaryWriter(baseUrl+'runs/Pathvqa_experiment_phase3')
 wandb.init(
-    project="phase3_with_initial_lxrt_model_without_initial_weights")
+    project="phase3_with_initial_lxrt_model_lotgitfc_slightly_modified")
 DataTuple = collections.namedtuple("DataTuple", 'dataset loader evaluator')
 valid_bs = 256
 
