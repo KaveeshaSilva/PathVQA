@@ -228,7 +228,7 @@ class PVQA:
                     target_answers.append(target_ans)
 
                 logit = self.model(feats, boxes, sent,
-                                   target_answers, t='qa_woi')
+                                   target_answers)
                 score, label = logit.max(1)
                 for qid, l in zip(ques_id, label.cpu().numpy()):
                     ans = dset.label2ans[l]
