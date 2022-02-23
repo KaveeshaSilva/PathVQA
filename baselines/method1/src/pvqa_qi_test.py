@@ -19,7 +19,8 @@ baseUrl = 'drive/MyDrive/PathVQA'
 checkpoint_dir = baseUrl+"/checkpoint_LXRT.pth"
 load_dir = baseUrl+"/checkpoint"
 temp_checkpoint_save_dir = baseUrl+"/checkpoint_with_LXRT.pth"
-adv_model_dir = baseUrl+"/model_qa_all.pth"
+adv_model_dir = baseUrl + \
+    "/checkpoint_phase3_with_initial_lxrt_model_without_phase2_weights.pth"
 
 startFrom = 'B'  # M - middle ,   B - beginning
 
@@ -57,7 +58,7 @@ class PVQA:
             self.valid_tuple = None
 
         # Model
-        self.model = self.newLoadModel()['full_model']     # update this
+        self.model = self.newLoadModel()['saved_full_model']
 
         # # Load pre-trained weights
         # if args.load_lxmert is not None:
@@ -113,7 +114,7 @@ class PVQA:
             print('loss')
             print(running_loss)
 
-        start_epoch = lastEpoch + 1  
+        start_epoch = lastEpoch + 1
 
         # new to add model graph to tensorboard
         # dataiter = enumerate(loader)
@@ -226,10 +227,8 @@ class PVQA:
                     target_ans = dset.label2ans[target_label]
                     target_answers.append(target_ans)
 
-#                 logit = self.model(feats, boxes, sent,
-#                                    target_answers, t='qa_woi')
                 logit = self.model(feats, boxes, sent,
-                                   target_answers)
+                                   target_answers, t='qa_woi')
                 score, label = logit.max(1)
                 for qid, l in zip(ques_id, label.cpu().numpy()):
                     ans = dset.label2ans[l]

@@ -19,8 +19,7 @@ baseUrl = 'drive/MyDrive/PathVQA'
 checkpoint_dir = baseUrl+"/checkpoint_LXRT.pth"
 load_dir = baseUrl+"/checkpoint"
 temp_checkpoint_save_dir = baseUrl+"/checkpoint_with_LXRT.pth"
-adv_model_dir = baseUrl + \
-    "/checkpoint_phase3_with_initial_lxrt_model_without_phase2_weights.pth"
+adv_model_dir = baseUrl + "/model_qa_all.pth"
 
 startFrom = 'B'  # M - middle ,   B - beginning
 
@@ -58,7 +57,7 @@ class PVQA:
             self.valid_tuple = None
 
         # Model
-        self.model = self.newLoadModel()['saved_full_model']
+        self.model = self.newLoadModel()['full_model']
 
         # # Load pre-trained weights
         # if args.load_lxmert is not None:
