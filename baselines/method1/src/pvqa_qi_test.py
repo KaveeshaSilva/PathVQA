@@ -21,11 +21,14 @@ load_dir = baseUrl+"/checkpoint"
 temp_checkpoint_save_dir = baseUrl+"/checkpoint_with_LXRT.pth"
 adv_model_dir = baseUrl + \
     "/checkpoint_phase3_with_initial_lxrt_model_without_phase2_weights.pth"
-LogFile = baseUrl+'/debug.txt'
+LogFileTrue = baseUrl+'/debug_true.txt'
+LogFileFalse = baseUrl+'/debug_false.txt'
 # f = open(os.path.dirname(os.path.abspath(__file__)+"/"+writeFileName, "w+")
-f = open(LogFile, "w+")
+f = open(LogFileTrue, "w+")
+f = open(LogFileFalse, "w+")
 # f.close()
-LogFile = open(LogFile, "r+")
+LogFileTrue = open(LogFileTrue, "r+")
+LogFileFalse = open(LogFileFalse, "r+")
 
 startFrom = 'B'  # M - middle ,   B - beginning
 
@@ -240,21 +243,21 @@ class PVQA:
                     ans = dset.label2ans[l]
                     quesid2ans[qid.item()] = ans
 
-                    # log.write(str(i)+'\n')
-                for qid, l, sentence, targ, imageId, in zip(ques_id, label.cpu().numpy(), sent.cpu().numpy(), target.cpu().numpy(), img_id.cpu().numpy()):
+                for qid, l, sentence, targ, imageId, in zip(ques_id, label.cpu().numpy(), sent, target_answers, img_id):
                     ans = dset.label2ans[l]
-                    log_str = "image id : " + str(imageId) + "Question : " + str(
-                        sentence) + "Target : " + str(targ) + "Predicted : " + str(ans)
+                    log_str = "image id : " + str(imageId) + " --- Question : " + str(
+                        sentence) + " --- Target : " + str(targ) + " --- Predicted : " + str(ans)
                     if(ans == targ):
+                        LogFileTrue.write(log_str+'\n')
                         true_count += 1
                     else:
+                        LogFileFalse.write(log_str+'\n')
                         false_count += 1
-                    LogFile.write(log_str+'\n')
         total = false_count+true_count
         print("True Count : " + str(true_count) +
-              " - " + str(true_count/total))
+              " - " + str(round(true_count/total, 2))+"%")
         print("False Count : " + str(false_count) +
-              " - " + str(false_count/total))
+              " - " + str(round(false_count/total, 2))+"%")
         print("Total Count : " + str(total))
 
         if dump is not None:
