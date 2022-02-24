@@ -21,6 +21,11 @@ load_dir = baseUrl+"/checkpoint"
 temp_checkpoint_save_dir = baseUrl+"/checkpoint_with_LXRT.pth"
 adv_model_dir = baseUrl + \
     "/checkpoint_phase3_with_initial_lxrt_model_without_phase2_weights.pth"
+LogFile = baseUrl+'/debug.txt'
+# f = open(os.path.dirname(os.path.abspath(__file__)+"/"+writeFileName, "w+")
+f = open(LogFile, "w+")
+# f.close()
+LogFile = open(LogFile, "r+")
 
 startFrom = 'B'  # M - middle ,   B - beginning
 
@@ -215,7 +220,8 @@ class PVQA:
         self.model.eval()
         dset, loader, evaluator = eval_tuple
         quesid2ans = {}
-
+        true_count = 0
+        false_count = 0
         for i, datum_tuple in enumerate(loader):
             # Avoid seeing ground truth
             ques_id, feats, boxes, sent, target, img_id, img_info = datum_tuple
@@ -233,6 +239,24 @@ class PVQA:
                 for qid, l in zip(ques_id, label.cpu().numpy()):
                     ans = dset.label2ans[l]
                     quesid2ans[qid.item()] = ans
+
+                    # log.write(str(i)+'\n')
+                for qid, l, sentence, targ, imageId, in zip(ques_id, label.cpu().numpy(), sent.cpu().numpy(), target.cpu().numpy(), img_id.cpu().numpy()):
+                    ans = dset.label2ans[l]
+                    log_str = "image id : " + str(imageId) + "Question : " + str(
+                        sentence) + "Target : " + str(targ) + "Predicted : " + str(ans)
+                    if(ans == targ):
+                        true_count += 1
+                    else:
+                        false_count += 1
+                    LogFile.write(log_str+'\n')
+        total = false_count+true_count
+        print("True Count : " + str(true_count) +
+              " - " + str(true_count/total))
+        print("False Count : " + str(false_count) +
+              " - " + str(false_count/total))
+        print("Total Count : " + str(total))
+
         if dump is not None:
             evaluator.dump_result(quesid2ans, dump)
         return quesid2ans
@@ -242,7 +266,7 @@ class PVQA:
         quesid2ans = self.predict(eval_tuple, dump)
         return eval_tuple.evaluator.evaluate(quesid2ans)
 
-    @staticmethod
+    @ staticmethod
     def oracle_score(data_tuple):
         dset, loader, evaluator = data_tuple
         quesid2ans = {}
