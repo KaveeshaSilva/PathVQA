@@ -23,9 +23,9 @@ baseUrl = 'drive/MyDrive/PathVQA'
 checkpoint_dir = baseUrl+"/checkpoint_LXRT.pth"
 load_dir = baseUrl+"/checkpoint"
 adv_checkpoint_save_dir = baseUrl + \
-    "/checkpoint_adv_with_autoencoder_discriminator_more_complex.pth"
+    "/checkpoint_adv_with_autoencoder_discriminator_more_complex_early_stop.pth"
 phase3_checkpoint_save_dir = baseUrl + \
-    "/checkpoint_phase3_with_initial_lxrt_model_without_phase2_weights.pth"
+    "/checkpoint_phase3_with_autoencoder_discriminator_more_complex_early_stop.pth"
 
 
 startFrom = 'B'  # M - middle ,   B - beginning
@@ -33,7 +33,7 @@ startFrom = 'B'  # M - middle ,   B - beginning
 # default `log_dir` is "runs" - we'll be more specific here
 writer = SummaryWriter(baseUrl+'runs/Pathvqa_experiment_phase3')
 wandb.init(
-    project="phase3_with_initial_lxrt_model_lotgitfc_slightly_modified")
+    project="phase3_with_autoencoder_discriminator_more_complex_early_stop")
 DataTuple = collections.namedtuple("DataTuple", 'dataset loader evaluator')
 valid_bs = 256
 
@@ -70,9 +70,9 @@ class PVQA:
                 self.train_tuple.dataset.num_answers)
             checkpoint = self.loadAdvCheckpoint()
 
-#             self.model.lxrt_encoder = checkpoint['model_lxrt']
-#             self.model.encoder = checkpoint['model_encoder']
-#             self.model.decoder = checkpoint['model_decoder']
+            self.model.lxrt_encoder = checkpoint['model_lxrt']
+            self.model.encoder = checkpoint['model_encoder']
+            self.model.decoder = checkpoint['model_decoder']
 
         if(startFrom == "M"):
             checkpoint = self.loadPhase3Checkpoint()
