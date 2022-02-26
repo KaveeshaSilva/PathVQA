@@ -36,8 +36,8 @@ class PVQAAutoencoderModel(nn.Module):
         #     GeLU()
         # )
         self.logit_fc = nn.Sequential(
-            #             nn.Linear(hid_dim, hid_dim * 2),
-            #             GeLU(),
+            nn.Linear(hid_dim, hid_dim * 2),
+            GeLU(),
             nn.Linear(hid_dim * 2, hid_dim * 2),
             GeLU(),
             BertLayerNorm(hid_dim * 2, eps=1e-12),
