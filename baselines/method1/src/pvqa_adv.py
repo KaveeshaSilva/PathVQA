@@ -121,9 +121,9 @@ class PVQAAdv:
             # self.optim = args.optimizer(self.model.parameters(), args.lr)
         if(startFrom == 'B'):
             self.optimizer_G = torch.optim.Adam(
-                self.q_i_model.lxrt_encoder.parameters(), lr=0.0002, betas=(0.5, 0.999))
+                self.q_i_model.lxrt_encoder.parameters(), lr=5e-5)
             self.optimizer_D = torch.optim.Adam(
-                self.discriminator.parameters(), lr=0.0002, betas=(0.5, 0.999))
+                self.discriminator.parameters(), lr=5e-5)
         else:
             self.optimizer_G = checkpoint['saved_optimizer_G']
             self.optimizer_D = checkpoint['saved_optimizer_D']
