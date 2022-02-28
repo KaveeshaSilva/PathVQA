@@ -26,7 +26,7 @@ baseUrl = 'drive/MyDrive/PathVQA'
 # load_dir = baseUrl+"/checkpoint"
 # temp_checkpoint_save_dir = baseUrl+"/checkpoint_with_LXRT.pth"
 new_checkpoint_save_dir = baseUrl + \
-    "/checkpoint_adv_with_autoencoder_discriminator_more_complex_early_stop.pth"  # checkpint_new_LXRT
+    "/checkpoint_adv_with_autoencoder_discriminator_more_complex_early_stop_lr.pth"  # checkpint_new_LXRT
 adv_model_dir = baseUrl+"/model_qa_all.pth"
 
 startFrom = 'B'  # M - middle ,   B - beginning
