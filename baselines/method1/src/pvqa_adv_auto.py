@@ -37,7 +37,7 @@ writer = SummaryWriter(baseUrl+'runs/adv_with_autoencoder')
 print('finished writer creating')
 
 wandb.init(
-    project="checkpoint_adv_with_autoencoder_discriminator_more_complex_early_stop")
+    project="checkpoint_adv_with_autoencoder_discriminator_more_complex_early_stop_2")
 
 
 DataTuple = collections.namedtuple("DataTuple", 'dataset loader evaluator')
@@ -130,9 +130,9 @@ class PVQAAdv:
             # self.optim = args.optimizer(self.model.parameters(), args.lr)
         if(startFrom == 'B'):
             self.optimizer_G = torch.optim.Adam(
-                self.q_i_model.parameters(), lr=0.0002, betas=(0.5, 0.999))
+                self.q_i_model.parameters(), lr=5e-5, betas=(0.5, 0.999))
             self.optimizer_D = torch.optim.Adam(
-                self.discriminator.parameters(), lr=0.0002, betas=(0.5, 0.999))
+                self.discriminator.parameters(), lr=5e-5, betas=(0.5, 0.999))
         else:
             self.optimizer_G = checkpoint['saved_optimizer_G']
             self.optimizer_D = checkpoint['saved_optimizer_D']
