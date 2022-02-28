@@ -10,7 +10,7 @@ import torch.nn as nn
 from torch.utils.data.dataloader import DataLoader
 from tqdm import tqdm
 from torch.autograd import Variable
-
+import wandb
 
 from param import args
 
@@ -24,8 +24,11 @@ baseUrl = 'drive/MyDrive/PathVQA'
 # load_dir = baseUrl+"/checkpoint"
 # temp_checkpoint_save_dir = baseUrl+"/checkpoint_with_LXRT.pth"
 new_checkpoint_save_dir = baseUrl + \
-    "/checkpoint_adv_LXRT_qi_2.pth"  # checkpint_new_LXRT
+    "/checkpoint_adv_without_autoencoder_initial_weight.pth"  # checkpint_new_LXRT
 adv_model_dir = baseUrl+"/model_qa_all.pth"
+
+wandb.init(
+    project="adv_without_autoencoder_initial_weight")
 
 startFrom = 'B'  # M - middle ,   B - beginning
 
@@ -226,7 +229,8 @@ class PVQAAdv:
                 running_loss_d += d_loss.item()
 
                 if i % 100 == 99:    # every 1000 mini-batches...
-
+                    wandb.log({'training g loss': running_loss_g / 100,
+                              'training d loss': running_loss_d / 100}, step=epoch * len(loader) + i)
                     # ...log the running loss
                     writer.add_scalar('training g loss',
                                       running_loss_g / 100,
