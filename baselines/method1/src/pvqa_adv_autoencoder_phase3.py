@@ -70,7 +70,8 @@ class PVQA:
                 self.train_tuple.dataset.num_answers)
             checkpoint = self.loadAdvCheckpoint()
 
-            self.model.lxrt_encoder = checkpoint['model_lxrt']
+            # self.model.lxrt_encoder = checkpoint['model_lxrt']
+            self.model.load_state_dict(checkpoint['model_lxrt_state_dict'])
             self.model.encoder = checkpoint['model_encoder']
             self.model.decoder = checkpoint['model_decoder']
 
