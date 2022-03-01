@@ -89,12 +89,12 @@ class PVQAAdv:
         # self.q_a_model = PVQAAdvModel(
         #     self.train_tuple.dataset.num_answers)  # load model
 
-        if(startFrom == 'B'):
+#         if(startFrom == 'B'):
             # Load pre-trained weights
-            if args.load_lxmert is not None:
-                print('load model from : '+str(args.load_lxmert)+'\n')
-                self.q_i_model.lxrt_encoder.load(args.load_lxmert)
-                # self.q_a_model.lxrt_encoder.load(args.load_lxmert)
+#             if args.load_lxmert is not None:
+#                 print('load model from : '+str(args.load_lxmert)+'\n')
+#                 self.q_i_model.lxrt_encoder.load(args.load_lxmert)
+#                 # self.q_a_model.lxrt_encoder.load(args.load_lxmert)
 
         # if args.load_lxmert_qa is not None:
         #     print(args.load_lxmert_qa)
@@ -123,8 +123,9 @@ class PVQAAdv:
         # else:
             # self.optim = args.optimizer(self.model.parameters(), args.lr)
         if(startFrom == 'B'):
-            self.optimizer_G = torch.optim.Adam(
-                self.q_i_model.lxrt_encoder.parameters(), lr=5e-5)
+            warmup_ratio = 0.05
+            self.optimizer_G = BertAdam(self.q_i_model.parameters(), lr=5e-5,
+                         warmup=warmup_ratio)
             self.optimizer_D = torch.optim.Adam(
                 self.discriminator.parameters(), lr=5e-5)
         else:
@@ -175,7 +176,7 @@ class PVQAAdv:
                 fake = Variable(Tensor(32, 1).fill_(0.0),  # 32 is the batch size
                                 requires_grad=False)
 
-                self.q_i_model.lxrt_encoder.train()
+                self.q_i_model.train()
 
                 # -----------------
                 #  Train Generator
