@@ -26,7 +26,7 @@ baseUrl = 'drive/MyDrive/PathVQA'
 # load_dir = baseUrl+"/checkpoint"
 # temp_checkpoint_save_dir = baseUrl+"/checkpoint_with_LXRT.pth"
 new_checkpoint_save_dir = baseUrl + \
-    "/checkpoint_adv_with_autoencoder_discriminator_more_complex_early_stop_lr.pth"  # checkpint_new_LXRT
+    "/checkpoint_adv_with_autoencoder_discriminator_more_complex_early_stop.pth"  # checkpint_new_LXRT
 adv_model_dir = baseUrl+"/model_qa_all.pth"
 
 startFrom = 'B'  # M - middle ,   B - beginning
@@ -37,7 +37,7 @@ writer = SummaryWriter(baseUrl+'runs/adv_with_autoencoder')
 print('finished writer creating')
 
 wandb.init(
-    project="checkpoint_adv_with_autoencoder_discriminator_more_complex_early_stop_2")
+    project="checkpoint_adv_with_autoencoder_discriminator_more_complex_early_stop_4")
 
 
 DataTuple = collections.namedtuple("DataTuple", 'dataset loader evaluator')
@@ -130,7 +130,7 @@ class PVQAAdv:
             # self.optim = args.optimizer(self.model.parameters(), args.lr)
         if(startFrom == 'B'):
             self.optimizer_G = torch.optim.Adam(
-                self.q_i_model.parameters(), lr=5e-5, betas=(0.5, 0.999))
+                self.q_i_model.parameters(), lr=0.0002, betas=(0.5, 0.999))
             self.optimizer_D = torch.optim.Adam(
                 self.discriminator.parameters(), lr=0.0002, betas=(0.5, 0.999))
         else:
@@ -394,6 +394,8 @@ class PVQAAdv:
             'model_encoder': self.q_i_model.encoder,
             'model_decoder': self.q_i_model.decoder,
             'model_lxrt_state_dict': self.q_i_model.lxrt_encoder.state_dict(),
+            'model_encoder_state_dict': self.q_i_model.encoder.state_dict(),
+            'model_decoder_state_dict': self.q_i_model.decoder.state_dict(),
             'saved_full_model_state_dict': self.q_i_model.state_dict(),
             'saved_full_model': self.q_i_model,
             'saved_Discriminator_state_dict': self.discriminator.state_dict(),
