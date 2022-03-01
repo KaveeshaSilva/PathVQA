@@ -176,12 +176,12 @@ class PVQAAdv:
                 fake = Variable(Tensor(32, 1).fill_(0.0),  # 32 is the batch size
                                 requires_grad=False)
 
-                self.q_i_model.train()
+                
 
                 # -----------------
                 #  Train Generator
                 # -----------------
-
+                self.q_i_model.train()
                 self.optimizer_G.zero_grad()
 
                 feats, boxes, target = feats.cuda(), boxes.cuda(), target.cuda()  # target 32 size
@@ -203,13 +203,14 @@ class PVQAAdv:
                 # Loss measures generator's ability to fool the discriminator
                 g_loss = self.adversarial_loss(dis_output_q_i, valid)
                 g_loss.backward()
-                nn.utils.clip_grad_norm_(self.q_i_model.parameters(), 5.)
+                nn.utils.clip_grad_norm_(self.q_i_model.parameters(), 1.)
                 self.optimizer_G.step()
 
                 # ---------------------
                 #  Train Discriminator
                 # ---------------------
 
+                self.discriminator.train()
                 self.optimizer_D.zero_grad()
                 dis_output_q_a = self.discriminator(q_a_embeeeding)
 
@@ -252,7 +253,7 @@ class PVQAAdv:
                 # //////////////////////////////////////////          continue from here
 
                 # added becoz of adv learning
-                nn.utils.clip_grad_norm_(self.q_i_model.parameters(), 5.)
+                nn.utils.clip_grad_norm_(self.q_i_model.parameters(), 1.)
                 self.optimizer_D.step()
 
                 # score, label = q_i_embeeeding.max(1)
