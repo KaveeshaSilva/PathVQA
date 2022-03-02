@@ -1,3 +1,4 @@
+import wandb
 from logging import NullHandler
 import re
 from tarfile import NUL
@@ -21,10 +22,12 @@ import numpy as np
 baseUrl = 'drive/MyDrive/PathVQA'
 checkpoint_dir = baseUrl+"/checkpoint_LXRT.pth"
 load_dir = baseUrl+"/checkpoint"
-temp_checkpoint_save_dir = baseUrl+"/checkpoint_original_model.pth"
+temp_checkpoint_save_dir = baseUrl+"/checkpoint_lxmert_adv_pretrain_model.pth"
 
 startFrom = 'B'  # M - middle ,   B - beginning
 
+wandb.init(
+    project="lxmert_adv_pretrain")
 # default `log_dir` is "runs" - we'll be more specific here
 writer = SummaryWriter(baseUrl+'runs/Pathvqa_experiment_check_image')
 
@@ -154,7 +157,8 @@ class PVQA:
                 running_loss += loss.item()
 
                 if i % 100 == 99:    # every 100 mini-batches...
-
+                    wandb.log({'running loss': running_loss / 100,
+                              'valid score': valid_score}, step=epoch * len(loader) + i)
                     # ...log the running loss
                     writer.add_scalar('training loss',
                                       running_loss / 100,
