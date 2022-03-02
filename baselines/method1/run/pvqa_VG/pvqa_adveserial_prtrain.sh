@@ -19,7 +19,7 @@ do
       --taskQA_woi --taskMatched --taskVA2 \
       --visualLosses obj,attr,feat \
       --wordMaskRate 0.15 --objMaskRate 0.15 \
-      --train  train --valid pvqa_val \
+      --train train --valid val \
       --loadLXMERT snap/pretrained/model \
       --llayers 9 --xlayers 5 --rlayers 5 \
       --batchSize 32 --optim bert --lr 1e-4 --epochs 2 \
