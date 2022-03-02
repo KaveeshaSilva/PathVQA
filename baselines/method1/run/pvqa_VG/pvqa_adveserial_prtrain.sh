@@ -20,7 +20,7 @@ do
       --visualLosses obj,attr,feat \
       --wordMaskRate 0.15 --objMaskRate 0.15 \
       --train train --valid val \
-      --loadLXMERT snap/pretrained/model \
+      --loadLXMERT ${baseUrl}/baselines/method1/snap/pretrained/model \
       --llayers 9 --xlayers 5 --rlayers 5 \
       --batchSize 32 --optim bert --lr 1e-4 --epochs 2 \
       --seed $seed --pvqaimgv $imgv \
