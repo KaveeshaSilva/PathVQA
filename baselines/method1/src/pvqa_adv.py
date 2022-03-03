@@ -122,12 +122,12 @@ class PVQAAdv:
         #                           t_total=t_total)
         # else:
             # self.optim = args.optimizer(self.model.parameters(), args.lr)
-            
+
         from lxrt.optimization import BertAdam
         if(startFrom == 'B'):
             warmup_ratio = 0.05
-            self.optimizer_G = torch.optim.BertAdam(self.q_i_model.parameters(), lr=5e-5,
-                                                    warmup=warmup_ratio)
+            self.optimizer_G = BertAdam(self.q_i_model.parameters(), lr=5e-5,
+                                        warmup=warmup_ratio)
             self.optimizer_D = torch.optim.Adam(
                 self.discriminator.parameters(), lr=5e-5)
         else:
