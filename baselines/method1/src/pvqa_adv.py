@@ -24,11 +24,11 @@ baseUrl = 'drive/MyDrive/PathVQA'
 # load_dir = baseUrl+"/checkpoint"
 # temp_checkpoint_save_dir = baseUrl+"/checkpoint_with_LXRT.pth"
 new_checkpoint_save_dir = baseUrl + \
-    "/checkpoint_adv_without_autoencoder_initial_weight.pth"  # checkpint_new_LXRT
+    "/checkpoint_adv_without_autoencoder_initial_weight_changed_optimizer.pth"  # checkpint_new_LXRT
 adv_model_dir = baseUrl+"/model_qa_all.pth"
 
 wandb.init(
-    project="adv_without_autoencoder_initial_weight")
+    project="adv_without_autoencoder_initial_weight_changed_optimizer")
 
 startFrom = 'B'  # M - middle ,   B - beginning
 
@@ -90,7 +90,7 @@ class PVQAAdv:
         #     self.train_tuple.dataset.num_answers)  # load model
 
 #         if(startFrom == 'B'):
-            # Load pre-trained weights
+        # Load pre-trained weights
 #             if args.load_lxmert is not None:
 #                 print('load model from : '+str(args.load_lxmert)+'\n')
 #                 self.q_i_model.lxrt_encoder.load(args.load_lxmert)
@@ -125,7 +125,7 @@ class PVQAAdv:
         if(startFrom == 'B'):
             warmup_ratio = 0.05
             self.optimizer_G = BertAdam(self.q_i_model.parameters(), lr=5e-5,
-                         warmup=warmup_ratio)
+                                        warmup=warmup_ratio)
             self.optimizer_D = torch.optim.Adam(
                 self.discriminator.parameters(), lr=5e-5)
         else:
@@ -175,8 +175,6 @@ class PVQAAdv:
                                  requires_grad=False)
                 fake = Variable(Tensor(32, 1).fill_(0.0),  # 32 is the batch size
                                 requires_grad=False)
-
-                
 
                 # -----------------
                 #  Train Generator
@@ -260,7 +258,7 @@ class PVQAAdv:
                 # for qid, l in zip(ques_id, label.cpu().numpy()):
                 #     ans = dset.label2ans[l]
                 #     quesid2ans[qid.item()] = ans
-            if(epoch % 5 == 0):
+            if(epoch % 3 == 0):
                 # save model when epoch = 50
                 print('checkpoint saved.  epoch : ' + str(epoch))
                 self.saveModelCheckpoint(epoch, running_loss_g, running_loss_d)
