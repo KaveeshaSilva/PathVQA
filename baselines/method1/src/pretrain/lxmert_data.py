@@ -7,7 +7,7 @@ import numpy as np
 from torch.utils.data import Dataset
 
 from param import args
-from qa_answer_table import AnswerTable
+from pretrain.qa_answer_table import AnswerTable
 from utils import load_obj_tsv
 
 TINY_IMG_NUM = 500
