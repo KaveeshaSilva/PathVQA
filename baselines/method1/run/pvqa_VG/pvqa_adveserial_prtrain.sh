@@ -51,7 +51,7 @@ do
 
   # See Readme.md for option details.
   CUDA_VISIBLE_DEVICES=0 PYTHONPATH=$PYTHONPATH:./src \
-      python src/tasks/pvqa.py \
+      python ${baseUrl}/baselines/method1/src/pretrain/lxmert_adv_pretrain.py \
       --test test  --train val --valid "" \
       --load ${ft_output}/BEST \
       --llayers 9 --xlayers 5 --rlayers 5 \
