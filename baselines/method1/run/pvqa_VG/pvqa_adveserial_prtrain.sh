@@ -15,7 +15,7 @@ do
 
   # Pre-trainin
   PYTHONPATH=$PYTHONPATH:./src \
-      python ${baseUrl}/baselines/method1/src/pvqa.py \
+      python ${baseUrl}/baselines/method1/src/pretrain/lxmert_adv_pretrain.py \
       --taskQA_woi --taskMatched --taskVA2 \
       --visualLosses obj,attr,feat \
       --wordMaskRate 0.15 --objMaskRate 0.15 \
@@ -34,7 +34,7 @@ do
 
   # See Readme.md for option details.
   CUDA_VISIBLE_DEVICES=0 PYTHONPATH=$PYTHONPATH:./src \
-      python src/tasks/pvqa.py \
+      python ${baseUrl}/baselines/method1/src/pretrain/lxmert_adv_pretrain.py \
       --train train --valid val  \
       --llayers 9 --xlayers 5 --rlayers 5 \
       --loadLXMERT ${pre_output}/Epoch01 \

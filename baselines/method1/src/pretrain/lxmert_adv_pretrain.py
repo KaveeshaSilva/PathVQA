@@ -1,6 +1,7 @@
 import collections
 import os
 import random
+import wandb
 
 from tqdm import tqdm
 import numpy as np
@@ -21,12 +22,13 @@ from torch.utils.tensorboard import SummaryWriter
 
 baseUrl = 'drive/MyDrive/PathVQA'
 adv_model_dir = baseUrl+"/model_qa_all.pth"
-
+temp_checkpoint_save_dir = baseUrl+"/checkpoint_lxmert_adv_pretrain_model.pth"
 writer = SummaryWriter(baseUrl+'runs/Pathvqa_experiment_adv_new_2')
+wandb.init(
+    project="lxmert_adv_pretrain")
 
 cuda = True if torch.cuda.is_available() else False
 Tensor = torch.cuda.FloatTensor if cuda else torch.FloatTensor
-
 
 
 DataTuple = collections.namedtuple(
@@ -569,12 +571,10 @@ class LXMERT:
     # def train_batch(self, optim, batch):
     #     optim.zero_grad()
     #     pooled_output = self.forward(batch)
-        
+
     #     loss.backward()
     #     nn.utils.clip_grad_norm_(self.model.parameters(), 1.)
     #     optim.step()
-
-        
 
     def valid_batch(self, batch):
         with torch.no_grad():
@@ -601,12 +601,12 @@ class LXMERT:
         #                  warmup=warmup_ratio, t_total=t_total)
 
         self.optimizer_G = BertAdam(self.model.parameters(), lr=args.lr,
-                         warmup=warmup_ratio, t_total=t_total)
+                                    warmup=warmup_ratio, t_total=t_total)
         self.optimizer_D = torch.optim.Adam(
-                self.discriminator.parameters(), lr=0.0002)
+            self.discriminator.parameters(), lr=0.0002)
 
         # Train
-        
+
         for epoch in range(args.epochs):
             # self.model.task_qa = False
             # args.task_qa = False
@@ -623,15 +623,12 @@ class LXMERT:
             uid2ans = {}
             i = 0
             for batch in tqdm(train_ld, total=len(train_ld)):
-                
 
-                 # Adversarial ground truths
+                # Adversarial ground truths
                 valid = Variable(Tensor(32, 1).fill_(1.0),  # 32 is the batch size
                                  requires_grad=False)
                 fake = Variable(Tensor(32, 1).fill_(0.0),  # 32 is the batch size
                                 requires_grad=False)
-
-                
 
                 # -----------------
                 #  Train Generator
@@ -641,15 +638,15 @@ class LXMERT:
 
                 feats, boxes, target = feats.cuda(), boxes.cuda(), target.cuda()  # target 32 size
 
-        
-
                 q_i_embeeeding = self.forward(batch)
 
-                feats, boxes, sent, target_answers = self.getQaEmbeddingGeneratorInputs(batch)
+                feats, boxes, sent, target_answers = self.getQaEmbeddingGeneratorInputs(
+                    batch)
 
-                print(sent,target_answers)
+                print(sent, target_answers)
 
-                q_a_embeeeding = self.q_a_model(feats, boxes, sent, target_answers, t='qa_woi')  # answer from trained model
+                q_a_embeeeding = self.q_a_model(
+                    feats, boxes, sent, target_answers, t='qa_woi')  # answer from trained model
 
                 assert q_i_embeeeding.dim() == q_a_embeeeding.dim()
 
@@ -686,7 +683,8 @@ class LXMERT:
                 i += 1
 
                 if i % 100 == 99:    # every 1000 mini-batches...
-
+                    wandb.log({'training g loss': running_loss_g / 100,
+                              'training d loss': running_loss_d / 100}, step=epoch * len(loader) + i)
                     # ...log the running loss
                     writer.add_scalar('training g loss',
                                       running_loss_g / 100,
@@ -714,7 +712,7 @@ class LXMERT:
                 # for qid, l in zip(ques_id, label.cpu().numpy()):
                 #     ans = dset.label2ans[l]
                 #     quesid2ans[qid.item()] = ans
-            if(epoch % 5 == 0):
+            if(epoch % 3 == 0):
                 # save model when epoch = 50
                 print('checkpoint saved.  epoch : ' + str(epoch))
                 self.saveModelCheckpoint(epoch, running_loss_g, running_loss_d)
@@ -745,13 +743,28 @@ class LXMERT:
         writer.close()
 
         self.save("LAST")
-                
-                
-
 
     def save(self, name):
         torch.save(self.model.state_dict(),
                    os.path.join(args.output, "%s_LXRT.pth" % name))
+
+    def saveModelCheckpoint(self, EPOCH, LOSS_G, LOSS_D):
+        PATH = temp_checkpoint_save_dir
+        torch.save({
+            'last_epoch': EPOCH,
+            'model_lxrt': self.model.lxrt_encoder,
+            'model_lxrt_state_dict': self.model.lxrt_encoder.state_dict(),
+            'saved_full_model_state_dict': self.model.state_dict(),
+            'saved_full_model': self.model,
+            'saved_Discriminator_state_dict': self.discriminator.state_dict(),
+            'saved_Discriminator': self.discriminator,
+            'saved_optimizer_G_state_dict': self.optimizer_G.state_dict(),
+            'saved_optimizer_G': self.optimizer_G,
+            'saved_optimizer_D_state_dict': self.optimizer_D.state_dict(),
+            'saved_optimizer_D': self.optimizer_D,
+            'last_running_loss_d': LOSS_D,
+            'last_running_loss_g': LOSS_G,
+        }, PATH)
 
     def load(self, path):
         print("Load BERT extractor from %s" % path)
@@ -787,38 +800,37 @@ class LXMERT:
         print()
 
         self.model.load_state_dict(state_dict, strict=False)
-    
+
     def loadQAModel(self):
         PATH = adv_model_dir
         checkpoint = torch.load(PATH)
         return checkpoint
 
-    def getQaEmbeddingGeneratorInputs(self,examples):
+    def getQaEmbeddingGeneratorInputs(self, examples):
         train_features = [convert_example_to_features(example, self.max_seq_length, self.tokenizer)
                           for example in examples]
-
 
         # Visual Inputs
         feats = torch.from_numpy(
             np.stack([f.visual_feats[0] for f in train_features])).cuda()
         pos = torch.from_numpy(
             np.stack([f.visual_feats[1] for f in train_features])).cuda()
-        
+
         def getSentAndAnswer(example: InputExample):
             sent = [example.sent.strip()]
             ans = [example.answer.strip()]
-            return [sent,ans]
-        
+            return [sent, ans]
+
         language = [getSentAndAnswer(example)
-                          for example in examples]
-        
+                    for example in examples]
+
         sent = torch.from_numpy(
             np.stack([l[0] for l in language]))
-        
+
         ans = torch.from_numpy(
             np.stack([l[1] for l in language]))
 
-        return feats,pos,sent,ans
+        return feats, pos, sent, ans
 
 
 if __name__ == "__main__":
