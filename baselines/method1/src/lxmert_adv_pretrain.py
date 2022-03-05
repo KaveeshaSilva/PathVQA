@@ -10,7 +10,7 @@ import torch.nn as nn
 from torch.utils.data import DataLoader
 
 from param import args
-from lxmert_data import InputExample, LXMERTDataset, LXMERTTorchDataset, LXMERTEvaluator
+from pretrain.lxmert_data import InputExample, LXMERTDataset, LXMERTTorchDataset, LXMERTEvaluator
 from lxrt.entry import set_visual_config
 from lxrt.tokenization import BertTokenizer
 from lxrt.modeling_adv import LXRTPretraining
