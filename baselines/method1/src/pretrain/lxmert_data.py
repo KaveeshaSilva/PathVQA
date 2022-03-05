@@ -59,7 +59,8 @@ class LXMERTDataset:
         # Loading datasets to data
         self.data = []
         for source in self.sources:
-            self.data.extend(json.load(open("data/lxmert/%s.json" % source)))
+            self.data.extend(
+                json.load(open("data/lxmert/pvqa_%s.json" % source)))
         print("Load %d data from %s" % (len(self.data), self.name))
 
         # Create answer table according to the qa_sets
