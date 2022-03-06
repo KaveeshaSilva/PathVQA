@@ -12,6 +12,7 @@ from utils import load_obj_tsv
 
 TINY_IMG_NUM = 500
 FAST_IMG_NUM = 5000
+baseUrl = 'drive/MyDrive/PathVQA/'
 
 Split2ImgFeatPath = {
     'mscoco_train': 'data/mscoco_imgfeat/train2014_obj36.tsv',
@@ -60,7 +61,7 @@ class LXMERTDataset:
         self.data = []
         for source in self.sources:
             self.data.extend(
-                json.load(open("data/lxmert/pvqa_%s.json" % source)))
+                json.load(open(baseUrl+"baselines/method1/saved/lxmert/%s.json" % source)))
         print("Load %d data from %s" % (len(self.data), self.name))
 
         # Create answer table according to the qa_sets
