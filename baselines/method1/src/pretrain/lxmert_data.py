@@ -15,13 +15,13 @@ FAST_IMG_NUM = 5000
 baseUrl = 'drive/MyDrive/PathVQA/'
 
 Split2ImgFeatPath = {
-    'mscoco_train': 'data/mscoco_imgfeat/train2014_obj36.tsv',
-    'mscoco_minival': 'data/mscoco_imgfeat/val2014_obj36.tsv',
-    'mscoco_nominival': 'data/mscoco_imgfeat/val2014_obj36.tsv',
-    'vgnococo': 'data/vg_gqa_imgfeat/vg_gqa_obj36.tsv',
-    'pvqa_train': 'data/pvqa/images/train%s.csv' % args.pvqaimgv,
-    'pvqa_test': 'data/pvqa/images/test%s.csv' % args.pvqaimgv,
-    'pvqa_val': 'data/pvqa/images/val%s.csv' % args.pvqaimgv
+    'mscoco_train': baseUrl+'data/mscoco_imgfeat/train2014_obj36.tsv',
+    'mscoco_minival': baseUrl+'data/mscoco_imgfeat/val2014_obj36.tsv',
+    'mscoco_nominival': baseUrl+'data/mscoco_imgfeat/val2014_obj36.tsv',
+    'vgnococo': baseUrl+'data/vg_gqa_imgfeat/vg_gqa_obj36.tsv',
+    'pvqa_train': baseUrl+'data/pvqa/images/train%s.csv' % args.pvqaimgv,
+    'pvqa_test': baseUrl+'data/pvqa/images/test%s.csv' % args.pvqaimgv,
+    'pvqa_val': baseUrl+'data/pvqa/images/val%s.csv' % args.pvqaimgv
 }
 
 
