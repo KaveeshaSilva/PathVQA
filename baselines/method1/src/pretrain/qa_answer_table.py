@@ -4,6 +4,8 @@ import json
 import torch
 from param import args
 
+baseUrl = 'drive/MyDrive/PathVQA/'
+
 
 class AnswerTable:
     ANS_CONVERT = {
@@ -34,7 +36,8 @@ class AnswerTable:
             file = 'all_ans_withpvqa.json'
         else:
             file = 'all_ans.json'
-        self.all_ans = json.load(open("data/lxmert/%s" % file))
+        self.all_ans = json.load(
+            open(baseUrl+"baselines/method1/saved/lxmert/%s" % file))
         if dsets is not None:
             dsets = set(dsets)
             # If the answer is used in the dsets
@@ -45,7 +48,8 @@ class AnswerTable:
         self.ans_set = set(self.anss)
 
         self._id2ans_map = self.anss
-        self._ans2id_map = {ans: ans_id for ans_id, ans in enumerate(self.anss)}
+        self._ans2id_map = {ans: ans_id for ans_id,
+                            ans in enumerate(self.anss)}
 
         assert len(self._id2ans_map) == len(self._ans2id_map)
         for ans_id, ans in enumerate(self._id2ans_map):
@@ -109,7 +113,8 @@ def load_lxmert_qa(path, model, label2ans):
 
     # Handle Multi-GPU pre-training --> Single GPU fine-tuning
     for key in list(loaded_state_dict.keys()):
-        loaded_state_dict[key.replace("module.", '')] = loaded_state_dict.pop(key)
+        loaded_state_dict[key.replace(
+            "module.", '')] = loaded_state_dict.pop(key)
 
     # Isolate bert model
     bert_state_dict = {}
@@ -145,7 +150,8 @@ def load_lxmert_qa(path, model, label2ans):
             new_answer_weight[label] = 0.
             new_answer_bias[label] = 0.
             unload += 1
-    print("Loaded %d answers from LXRTQA pre-training and %d not" % (loaded, unload))
+    print("Loaded %d answers from LXRTQA pre-training and %d not" %
+          (loaded, unload))
     print()
     answer_state_dict['logit_fc.3.weight'] = new_answer_weight
     answer_state_dict['logit_fc.3.bias'] = new_answer_bias
