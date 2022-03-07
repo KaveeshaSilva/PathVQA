@@ -455,7 +455,7 @@ class LXMERT:
             "bert-base-uncased"
         )
 
-        self.q_a_model = PVQAAdvModel(self.train_tuple.dataset.num_answers)
+        self.q_a_model = PVQAAdvModel(4092)
         self.q_a_model.lxrt_encoder = self.loadQAModel()['model_lxrt']
 
         self.discriminator = Discriminator()
