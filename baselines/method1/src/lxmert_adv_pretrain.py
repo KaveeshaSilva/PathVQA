@@ -586,7 +586,7 @@ class LXMERT:
 
     def train(self, train_tuple: DataTuple, eval_tuple: DataTuple):
         train_ld = train_tuple.loader
-        dset, loader, evaluator = train_tuple
+        dset, torchdset, loader, evaluator = train_tuple
 
         # Optimizer
         from lxrt.optimization import BertAdam
