@@ -635,13 +635,11 @@ class LXMERT:
                 # -----------------
 
                 self.optimizer_G.zero_grad()
-
+                feats, boxes, sent, target_answers = self.getQaEmbeddingGeneratorInputs(
+                    batch)
                 feats, boxes, target = feats.cuda(), boxes.cuda(), target.cuda()  # target 32 size
 
                 q_i_embeeeding = self.forward(batch)
-
-                feats, boxes, sent, target_answers = self.getQaEmbeddingGeneratorInputs(
-                    batch)
 
                 print(sent, target_answers)
 
