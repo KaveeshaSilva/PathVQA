@@ -815,13 +815,15 @@ class LXMERT:
             np.stack([f.visual_feats[1] for f in train_features])).cuda()
 
         def getSentAndAnswer(example: InputExample):
-            sent = [example.sent.strip()]
-            ans = [example.answer.strip()]
+            sent = example.sent.strip()
+            ans = example.answer.strip()
             return [sent, ans]
 
         language = [getSentAndAnswer(example)
                     for example in examples]
-        print("languages : "+str(language))
+        print("language  "+language)
+        print("language[0]  "+language[0][0])
+        print("train_features   "+ train_features[0].visual_feats[0])
         sent = torch.from_numpy(
             np.stack([l[0] for l in language]))
 
