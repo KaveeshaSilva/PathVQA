@@ -622,9 +622,9 @@ class LXMERT:
             # Train
             self.model.train()
             self.discriminator.train()
-            total_loss = 0.
-            total_losses = 0.
             uid2ans = {}
+            running_loss_g = 0.0
+            running_loss_d = 0.0
             i = 0
             for batch in tqdm(train_ld, total=len(train_ld)):
 
