@@ -215,6 +215,7 @@ class LXMERTTorchDataset(Dataset):
                 answer = ans
 
         else:
+            print("lxmert_datum_ans_null :" + str(datum))
             label = None
 
         replace_answer = answer
