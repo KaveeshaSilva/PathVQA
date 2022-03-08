@@ -163,7 +163,6 @@ class LXMERTTorchDataset(Dataset):
         return feat
 
     def __getitem__(self, item: int):
-        print("get item ...")
         datum = self.data[item]
 
         uid = datum['uid']
@@ -217,7 +216,6 @@ class LXMERTTorchDataset(Dataset):
         else:
 
             label = None
-        print("lxmert_datum_ans_null :" + str(datum))
 
         replace_answer = answer
         replace_label = label
