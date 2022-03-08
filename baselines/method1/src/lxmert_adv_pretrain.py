@@ -819,10 +819,13 @@ class LXMERT:
             np.stack([f.visual_feats[1] for f in train_features])).cuda()
 
         def getSentAndAnswer(example: InputExample):
-            print("ques: "+str(example.sent))
-            print("ans: "+str(example.answer))
-            sent = example.sent.strip()
-            ans = example.answer.strip()
+            try:
+                sent = example.sent.strip()
+                ans = example.answer.strip()
+            except:
+                if(example.sent != "What is present ?"):
+                    print("ques: "+str(example.sent))
+
             return [sent, ans]
 
         language = [getSentAndAnswer(example)
