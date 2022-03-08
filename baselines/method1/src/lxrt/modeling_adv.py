@@ -1024,7 +1024,6 @@ class LXRTPretraining(BertPreTrainedModel):
                 input_ids_a=None, token_type_ids_a=None, attention_mask_a=None, masked_lm_labels_a=None,
                 input_ids_a_rps=None, token_type_ids_a_rps=None, attention_mask_a_rps=None,
                 masked_lm_labels_a_rps=None):
-        
 
         # may need some change
         # img ~ question match
@@ -1036,8 +1035,8 @@ class LXRTPretraining(BertPreTrainedModel):
 
             lang_prediction_scores_vq, cross_relationship_score_vq = self.cls(
                 lang_output_vq, pooled_output_vq)
-        
-        if args.task_adv:
+
+        if self.task_adv:
             (lang_output_vq, visn_output_vq), pooled_output_vq = self.bert(
                 input_ids_rps, token_type_ids_rps, attention_mask_rps,
                 visual_feats=(visual_feats, pos), t='vqa',
@@ -1046,12 +1045,10 @@ class LXRTPretraining(BertPreTrainedModel):
             # lang_prediction_scores_vq, cross_relationship_score_vq = self.cls(
             #     lang_output_vq, pooled_output_vq)
 
-        
-
         # total_loss = 0.
         # loss_fct = CrossEntropyLoss(ignore_index=-1)
         # losses = ()
-        
+
         # if matched_label is not None and self.task_matched:
         #     matched_loss = loss_fct(
         #         cross_relationship_score_vq.view(-1, 2),
@@ -1060,8 +1057,7 @@ class LXRTPretraining(BertPreTrainedModel):
         #     matched_loss *= args.vq_w  # weight of multi task
         #     total_loss += matched_loss
         #     losses += (matched_loss.detach(),)
-        
-        
+
         return pooled_output_vq
 
 
