@@ -657,7 +657,7 @@ class LXMERT:
                 # Loss measures generator's ability to fool the discriminator
                 g_loss = self.adversarial_loss(dis_output_q_i, valid)
                 g_loss.backward()
-                nn.utils.clip_grad_norm_(self.q_i_model.parameters(), 1.)
+                nn.utils.clip_grad_norm_(self.model.parameters(), 1.)
                 self.optimizer_G.step()
 
                 # ---------------------
@@ -707,7 +707,7 @@ class LXMERT:
                 # //////////////////////////////////////////          continue from here
 
                 # added becoz of adv learning
-                nn.utils.clip_grad_norm_(self.q_i_model.parameters(), 1.)
+                nn.utils.clip_grad_norm_(self.discriminator.parameters(), 1.)
                 self.optimizer_D.step()
 
                 # score, label = q_i_embeeeding.max(1)
