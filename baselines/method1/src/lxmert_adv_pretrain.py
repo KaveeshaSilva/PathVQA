@@ -821,9 +821,10 @@ class LXMERT:
 
         language = [getSentAndAnswer(example)
                     for example in examples]
-        print("language  "+ str(language))
-        print("language[0]  "+ str(language[0][0]))
-        print("train_features   "+ str(train_features[0].visual_feats[0]))
+        print("language  " + str(language))
+        print("language[0][0]  " + str(language[0][0]))
+        print("train_features   " + str(train_features[0].visual_feats[0]))
+        print(str([l[0] for l in language]))
         sent = torch.from_numpy(
             np.stack([l[0] for l in language]))
 
