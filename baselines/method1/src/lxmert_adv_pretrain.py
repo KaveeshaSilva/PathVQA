@@ -459,6 +459,7 @@ class LXMERT:
         self.q_a_model.lxrt_encoder = self.loadQAModel()['model_lxrt']
 
         self.discriminator = Discriminator()
+        self.adversarial_loss = torch.nn.BCELoss()
 
         # Weight initialization and loading
         # if args.from_scratch:
