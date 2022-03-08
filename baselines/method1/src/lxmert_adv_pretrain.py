@@ -823,7 +823,7 @@ class LXMERT:
                 sent = example.sent.strip()
                 ans = example.answer.strip()
             except:
-                print("uid :" + example.uid)
+                print("uid :" + str(example.uid))
                 # if(example.sent != "What is present ?"):
                 print("ques: "+str(example.sent))
 
