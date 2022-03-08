@@ -163,6 +163,7 @@ class LXMERTTorchDataset(Dataset):
         return feat
 
     def __getitem__(self, item: int):
+        print("get item ...")
         datum = self.data[item]
 
         uid = datum['uid']
