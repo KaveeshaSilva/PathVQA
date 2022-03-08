@@ -214,10 +214,10 @@ class LXMERTTorchDataset(Dataset):
                 label[self.raw_dataset.answer_table.ans2id(
                     ans)] = label.pop(ans)
                 answer = ans
-
         else:
-            print("lxmert_datum_ans_null :" + str(datum))
+
             label = None
+        print("lxmert_datum_ans_null :" + str(datum))
 
         replace_answer = answer
         replace_label = label
