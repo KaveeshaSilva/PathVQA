@@ -645,7 +645,7 @@ class LXMERT:
 
                 q_i_embeeeding = self.forward(batch)
 
-                print(sent, target_answers)
+                # print(sent, target_answers)
 
                 q_a_embeeeding = self.q_a_model(
                     feats, boxes, sent, target_answers, t='qa_woi')  # answer from trained model
