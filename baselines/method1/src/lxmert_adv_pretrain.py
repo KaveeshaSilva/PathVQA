@@ -472,6 +472,9 @@ class LXMERT:
 
         # GPU Options
         self.model = self.model.cuda()
+        self.discriminator = self.discriminator.cuda()
+        self.q_a_model = self.q_a_model.cuda()
+
         if args.multiGPU:
             self.model = nn.DataParallel(self.model)
 
