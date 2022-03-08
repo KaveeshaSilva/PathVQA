@@ -824,12 +824,9 @@ class LXMERT:
         print("language  " + str(language))
         print("language[0][0]  " + str(language[0][0]))
         print("train_features   " + str(train_features[0].visual_feats[0]))
-        print(str([l[0] for l in language]))
-        sent = torch.from_numpy(
-            np.stack([l[0] for l in language]))
+        sent = [l[0] for l in language]
 
-        ans = torch.from_numpy(
-            np.stack([l[1] for l in language]))
+        ans = [l[1] for l in language]
 
         return feats, pos, sent, ans
 
