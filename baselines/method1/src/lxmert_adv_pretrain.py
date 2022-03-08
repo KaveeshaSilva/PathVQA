@@ -820,12 +820,14 @@ class LXMERT:
 
         def getSentAndAnswer(example: InputExample):
             # try:
+            print("ans : "+str(example.answer))
+
             sent = example.sent.strip()
             ans = example.answer.strip()
+            # print("")
             # except:
             #     # print("uid :" + str(example.uid))
             #     # # if(example.sent != "What is present ?"):
-            #     # print("ques: "+str(example.sent))
 
             return [sent, ans]
 
