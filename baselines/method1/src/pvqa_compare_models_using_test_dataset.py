@@ -327,12 +327,15 @@ class PVQA:
         state_dict = torch.load("%s.pth" % path)
         self.model.load_state_dict(state_dict)
 
-    def newLoadModel(self):
-        PATH = adv_model_dir
+    def loadInitModel(self):
+        PATH = init_model_dir
         checkpoint = torch.load(PATH)
         return checkpoint
-        self.model.load_state_dict(checkpoint['model_state_dict'])
-        self.optim.load_state_dict(checkpoint['optimizer_state_dict'])
+
+    def loadImpModel(self):
+        PATH = imp_model_dir
+        checkpoint = torch.load(PATH)
+        return checkpoint
 
     def getLastEpoch(self):
         PATH = checkpoint_dir
