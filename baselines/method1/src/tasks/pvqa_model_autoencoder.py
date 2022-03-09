@@ -19,15 +19,15 @@ class PVQAAutoencoderModel(nn.Module):
             args,
             max_seq_length=MAX_PVQA_LENGTH
         )
-        self.encoder = nn.Sequential(
-            nn.Linear(768, 1),
-            nn.ReLU()
-        )
+        # self.encoder = nn.Sequential(
+        #     nn.Linear(768, 1),
+        #     nn.ReLU()
+        # )
 
-        self.decoder = nn.Sequential(
-            nn.Linear(1, 768),
-            nn.ReLU()
-        )
+        # self.decoder = nn.Sequential(
+        #     nn.Linear(1, 768),
+        #     nn.ReLU()
+        # )
         hid_dim = self.lxrt_encoder.dim
 
         # VQA Answer heads
@@ -61,9 +61,9 @@ class PVQAAutoencoderModel(nn.Module):
         x = self.lxrt_encoder(
             sent, (feat, pos), target_answers, t=t)  # embedding
         # logit = self.logit_fc(x) #answer prediction
-        encoded = self.encoder(x)
-        decoded = self.decoder(encoded)
-        logit = self.logit_fc(decoded)
+        # encoded = self.encoder(x)
+        # decoded = self.decoder(encoded)
+        logit = self.logit_fc(x)
         # x = self.temp(x)
         # logit = self.logit_fc(x)
 
