@@ -626,6 +626,7 @@ class LXMERT:
             running_loss_g = 0.0
             running_loss_d = 0.0
             i = 0
+            ans_null_count = 0
             for batch in tqdm(train_ld, total=len(train_ld)):
 
                 # Adversarial ground truths
@@ -641,6 +642,12 @@ class LXMERT:
                 self.optimizer_G.zero_grad()
                 feats, boxes, sent, target_answers = self.getQaEmbeddingGeneratorInputs(
                     batch)
+
+                ans_null_count_batch = 0
+                for i in target_answers:
+                    if(i == ''):
+                        ans_null_count_batch += 1
+                ans_null_count += ans_null_count_batch
                 feats, boxes = feats.cuda(), boxes.cuda()  # target 32 size
 
                 q_i_embeeeding = self.forward(batch)
@@ -714,6 +721,8 @@ class LXMERT:
                 # for qid, l in zip(ques_id, label.cpu().numpy()):
                 #     ans = dset.label2ans[l]
                 #     quesid2ans[qid.item()] = ans
+            print("ans_null_count : " + str(ans_null_count) +
+                  " - epoch : "+str(epoch))
             if(epoch % 3 == 0):
                 # save model when epoch = 50
                 print('checkpoint saved.  epoch : ' + str(epoch))
