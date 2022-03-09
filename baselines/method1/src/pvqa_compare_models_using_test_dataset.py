@@ -252,10 +252,9 @@ class PVQA:
                     target_ans = dset.label2ans[target_label]
                     target_answers.append(target_ans)
 
-                logit_init = self.model_init(feats, boxes, sent,
-                                             target_answers)
-                logit_imp = self.model_imp(feats, boxes, sent,
-                                           target_answers)
+                logit_init = self.model_init(
+                    feats, boxes, sent, target_answers)
+                logit_imp = self.model_imp(feats, boxes, sent, target_answers)
                 score, label_init = logit_init.max(1)
                 score, label_imp = logit_imp.max(1)
                 for qid, l in zip(ques_id, label_init.cpu().numpy()):
