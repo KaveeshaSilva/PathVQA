@@ -644,8 +644,8 @@ class LXMERT:
                     batch)
 
                 ans_null_count_batch = 0
-                for i in target_answers:
-                    if(i == ''):
+                for t_ans in target_answers:
+                    if(t_ans == ''):
                         ans_null_count_batch += 1
                 ans_null_count += ans_null_count_batch
                 feats, boxes = feats.cuda(), boxes.cuda()  # target 32 size
