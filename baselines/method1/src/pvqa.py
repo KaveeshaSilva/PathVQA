@@ -22,12 +22,12 @@ import numpy as np
 baseUrl = 'drive/MyDrive/PathVQA'
 checkpoint_dir = baseUrl+"/checkpoint_LXRT.pth"
 load_dir = baseUrl+"/checkpoint"
-temp_checkpoint_save_dir = baseUrl+"/checkpoint_lxmert_adv_pretrain_model.pth"
+temp_checkpoint_save_dir = baseUrl+"/checkpoint_init_model.pth"
 
 startFrom = 'B'  # M - middle ,   B - beginning
 
 wandb.init(
-    project="lxmert_adv_pretrain")
+    project="init_model")
 # default `log_dir` is "runs" - we'll be more specific here
 writer = SummaryWriter(baseUrl+'runs/Pathvqa_experiment_check_image')
 
@@ -181,7 +181,7 @@ class PVQA:
                 for qid, l in zip(ques_id, label.cpu().numpy()):
                     ans = dset.label2ans[l]
                     quesid2ans[qid.item()] = ans
-            if(epoch % 3 == 0):
+            if(epoch % 1 == 0):
                 self.newSave(epoch, running_loss)  # save model when epoch = 50
 
             log_str = "\nEpoch- %d: Train %0.2f\n" % (
