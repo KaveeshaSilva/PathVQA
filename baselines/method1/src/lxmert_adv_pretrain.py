@@ -754,8 +754,8 @@ class LXMERT:
         PATH = temp_checkpoint_save_dir
         torch.save({
             'last_epoch': EPOCH,
-            'model_lxrt': self.model.lxrt_encoder,
-            'model_lxrt_state_dict': self.model.lxrt_encoder.state_dict(),
+            # 'model_lxrt': self.model.lxrt_encoder,
+            # 'model_lxrt_state_dict': self.model.lxrt_encoder.state_dict(),
             'saved_full_model_state_dict': self.model.state_dict(),
             'saved_full_model': self.model,
             'saved_Discriminator_state_dict': self.discriminator.state_dict(),
