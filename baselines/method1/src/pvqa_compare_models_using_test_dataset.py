@@ -265,7 +265,7 @@ class PVQA:
                     ans_init = dset.label2ans[l_init]
                     ans_imp = dset.label2ans[l_imp]
                     log_str = "image id : " + str(imageId) + " --- Question : " + str(
-                        sentence) + " --- Target : " + str(targ) + " --- Initial Predicted : " + str(ans_init) + " --- Improved Predicted : " + str(ans)
+                        sentence) + " --- Target : " + str(targ) + " --- Initial Predicted : " + str(ans_init) + " --- Improved Predicted : " + str(ans_imp)
                     if(ans_init == ans_imp):
                         if(ans_init == targ):
                             init_true__imp_true.write(log_str+'\n')
