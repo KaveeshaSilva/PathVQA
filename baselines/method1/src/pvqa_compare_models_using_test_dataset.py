@@ -32,7 +32,7 @@ f = open(init_false__imp_true, "w+")
 # f.close()
 init_true__imp_true = open(init_true__imp_true, "r+")
 init_true__imp_false = open(init_true__imp_false, "r+")
-init_false__imp_false = open(init_true__imp_false, "r+")
+init_false__imp_false = open(init_false__imp_false, "r+")
 init_false__imp_true = open(init_false__imp_true, "r+")
 
 init_model_dir = baseUrl + \
