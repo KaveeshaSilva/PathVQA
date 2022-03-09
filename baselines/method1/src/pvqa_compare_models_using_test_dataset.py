@@ -287,13 +287,13 @@ class PVQA:
         total = init_true__imp_true_count+init_false__imp_false_count + \
             init_false__imp_true_count+init_true__imp_false_count
         print("init_true__imp_true_count : " + str(init_true__imp_true_count) +
-              " - " + str(round(init_true__imp_true_count/total, 2))+"%")
+              " - " + str(round(init_true__imp_true_count/total, 4)*100)+"%")
         print("init_false__imp_false_count : " + str(init_false__imp_false_count) +
-              " - " + str(round(init_false__imp_false_count/total, 2))+"%")
+              " - " + str(round(init_false__imp_false_count/total, 4)*100)+"%")
         print("init_true__imp_false_count : " + str(init_true__imp_false_count) +
-              " - " + str(round(init_true__imp_false_count/total, 2))+"%")
+              " - " + str(round(init_true__imp_false_count/total, 4)*100)+"%")
         print("init_false__imp_true_count : " + str(init_false__imp_true_count) +
-              " - " + str(round(init_false__imp_true_count/total, 2))+"%")
+              " - " + str(round(init_false__imp_true_count/total, 4)*100)+"%")
         print("Total Count : " + str(total))
 
         if dump is not None:
