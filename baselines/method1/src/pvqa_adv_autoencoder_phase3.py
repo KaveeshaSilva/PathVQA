@@ -71,14 +71,14 @@ class PVQA:
             checkpoint = self.loadAdvCheckpoint()
 
             # self.model.lxrt_encoder = checkpoint['model_lxrt']
-            self.model.lxrt_encoder.load_state_dict(
-                checkpoint['model_lxrt_state_dict'])
-            # self.model.encoder = checkpoint['model_encoder']
-            # self.model.decoder = checkpoint['model_decoder']
-            self.model.encoder.load_state_dict(
-                checkpoint['model_encoder_state_dict'])
-            self.model.decoder.load_state_dict(
-                checkpoint['model_decoder_state_dict'])
+            # self.model.lxrt_encoder.load_state_dict(
+            #     checkpoint['model_lxrt_state_dict'])
+            # # self.model.encoder = checkpoint['model_encoder']
+            # # self.model.decoder = checkpoint['model_decoder']
+            # self.model.encoder.load_state_dict(
+            #     checkpoint['model_encoder_state_dict'])
+            # self.model.decoder.load_state_dict(
+            #     checkpoint['model_decoder_state_dict'])
 
         if(startFrom == "M"):
             checkpoint = self.loadPhase3Checkpoint()
@@ -90,10 +90,10 @@ class PVQA:
         # load encoder and decoder saved models
 
 #         Load pre-trained weights
-        # if args.load_lxmert is not None:
-        #     print(args.load_lxmert)
-        #     if(startFrom == 'B'):
-        #         self.model.lxrt_encoder.load(args.load_lxmert)
+        if args.load_lxmert is not None:
+            print("load pretrained "+str(args.load_lxmert))
+            if(startFrom == 'B'):
+                self.model.lxrt_encoder.load(args.load_lxmert)
             # else:
             #     self.model.lxrt_encoder.load(load_dir)
         # if args.load_lxmert_qa is not None:
