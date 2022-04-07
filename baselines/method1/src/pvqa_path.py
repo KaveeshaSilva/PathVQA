@@ -68,7 +68,7 @@ class PVQA:
         if(startFrom == 'B'):
             self.model = PVQAModelPath(
                 self.train_tuple.dataset.num_answers)
-            checkpoint = self.loadAdvCheckpoint()
+            # checkpoint = self.loadAdvCheckpoint()
 
             # self.model.lxrt_encoder = checkpoint['model_lxrt']
             # self.model.lxrt_encoder.load_state_dict(
