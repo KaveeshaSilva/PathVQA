@@ -23,17 +23,17 @@ baseUrl = 'drive/MyDrive/PathVQA'
 checkpoint_dir = baseUrl+"/checkpoint_LXRT.pth"
 load_dir = baseUrl+"/checkpoint"
 adv_checkpoint_save_dir = baseUrl + \
-    "/checkpoint_adv_with_autoencoder_discriminator_more_complex_early_stop.pth"
+    "/pvqa_path.pth"
 phase3_checkpoint_save_dir = baseUrl + \
-    "/checkpoint_phase3_with_autoencoder_discriminator_more_complex_early_stop.pth"
+    "/pvqa_path.pth"
 
 
 startFrom = 'B'  # M - middle ,   B - beginning
 
 # default `log_dir` is "runs" - we'll be more specific here
-writer = SummaryWriter(baseUrl+'runs/Pathvqa_experiment_phase3')
+writer = SummaryWriter(baseUrl+'runs/pvqa_path')
 wandb.init(
-    project="phase3_with_autoencoder_discriminator_more_complex_early_stop_4")
+    project="pvqa_path")
 DataTuple = collections.namedtuple("DataTuple", 'dataset loader evaluator')
 valid_bs = 256
 
