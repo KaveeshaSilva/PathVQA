@@ -10,7 +10,7 @@ from lxrt.modeling import BertLayerNorm, GeLU
 MAX_PVQA_LENGTH = 20
 
 
-class PVQAModel(nn.Module):
+class PVQAModelPath(nn.Module):
     def __init__(self, num_answers):
         super().__init__()
 
