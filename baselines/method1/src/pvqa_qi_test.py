@@ -20,7 +20,7 @@ checkpoint_dir = baseUrl+"/checkpoint_LXRT.pth"
 load_dir = baseUrl+"/checkpoint"
 temp_checkpoint_save_dir = baseUrl+"/checkpoint_with_LXRT.pth"
 adv_model_dir = baseUrl + \
-    "/checkpoint_phase3_with_initial_lxrt_model_without_phase2_weights.pth"
+    "/model_logit_fc_improved.pth"
 LogFileTrue = baseUrl+'/debug_true.txt'
 LogFileFalse = baseUrl+'/debug_false.txt'
 # f = open(os.path.dirname(os.path.abspath(__file__)+"/"+writeFileName, "w+")
@@ -145,9 +145,10 @@ class PVQA:
                 for target_label in (target.max(1)[1]).cpu().numpy():
                     target_ans = dset.label2ans[target_label]
                     target_answers.append(target_ans)
-
+                # print("target_answers " + str(target_answers))
+                # break
                 logit = self.model(feats, boxes, sent,
-                                   target_answers, t='qa_woi')
+                                   target_answers)
 
                 assert logit.dim() == target.dim() == 2
 
@@ -225,6 +226,7 @@ class PVQA:
         quesid2ans = {}
         true_count = 0
         false_count = 0
+        noAnsCount = 0
         for i, datum_tuple in enumerate(loader):
             # Avoid seeing ground truth
             ques_id, feats, boxes, sent, target, img_id, img_info = datum_tuple
@@ -232,9 +234,21 @@ class PVQA:
                 feats, boxes = feats.cuda(), boxes.cuda()
 
                 target_answers = []
-                for target_label in (target.max(1)[1]).cpu().numpy():
-                    target_ans = dset.label2ans[target_label]
-                    target_answers.append(target_ans)
+                for i in range(len(img_id)):
+                    t = target[i]
+                    t = t.tolist()
+                    s = max(t)
+                    if(int(s) == 0):
+                        noAnsCount += 1
+                        target_answers.append("Answer out of scope")
+                    else:
+                        target_label = t.index(s)
+                        target_ans = dset.label2ans[target_label]
+                        target_answers.append(target_ans)
+
+                # for target_label in (target.max(1)[1]).cpu().numpy():
+                #     target_ans = dset.label2ans[target_label]
+                #     target_answers.append(target_ans)
 
                 logit = self.model(feats, boxes, sent,
                                    target_answers)
@@ -246,13 +260,14 @@ class PVQA:
                 for qid, l, sentence, targ, imageId, in zip(ques_id, label.cpu().numpy(), sent, target_answers, img_id):
                     ans = dset.label2ans[l]
                     log_str = "image id : " + str(imageId) + " --- Question : " + str(
-                        sentence) + " --- Target : " + str(targ) + " --- Predicted : " + str(ans)
+                        sentence) + " --- Target : " + str(targ) + " --- Predicted : " + str(ans) + " --- Predicted Label : " + str(l)
                     if(ans == targ):
                         LogFileTrue.write(log_str+'\n')
                         true_count += 1
                     else:
                         LogFileFalse.write(log_str+'\n')
                         false_count += 1
+        print("no Ans Count "+str(noAnsCount))
         total = false_count+true_count
         print("True Count : " + str(true_count) +
               " - " + str(round(true_count/total, 2))+"%")
