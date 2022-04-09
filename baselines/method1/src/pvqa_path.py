@@ -166,7 +166,7 @@ class PVQA:
         for epoch in range(start_epoch, args.epochs):
             print("Start new epoch - epoch number : "+str(epoch))
             quesid2ans = {}
-            for i, (ques_id, feats, boxes, sent, target, img_id, img_info) in iter_wrapper(enumerate(loader)):
+            for i, (ques_id, feats, boxes, sent, target) in iter_wrapper(enumerate(loader)):
 
                 self.model.train()
 
@@ -268,7 +268,7 @@ class PVQA:
 
         for i, datum_tuple in enumerate(loader):
             # Avoid seeing ground truth
-            ques_id, feats, boxes, sent, target, img_id, img_info = datum_tuple
+            ques_id, feats, boxes, sent, target = datum_tuple
             with torch.no_grad():
                 feats, boxes = feats.cuda(), boxes.cuda()
 
@@ -304,7 +304,7 @@ class PVQA:
     def oracle_score(data_tuple):
         dset, loader, evaluator = data_tuple
         quesid2ans = {}
-        for i, (ques_id, feats, boxes, sent, target, img_id, img_info) in enumerate(loader):
+        for i, (ques_id, feats, boxes, sent, target) in enumerate(loader):
             _, label = target.max(1)
             for qid, l in zip(ques_id, label.cpu().numpy()):
                 ans = dset.label2ans[l]
