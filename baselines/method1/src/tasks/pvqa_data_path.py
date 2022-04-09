@@ -149,9 +149,9 @@ class PVQATorchDataset(Dataset):
             for ans, score in label.items():
                 if ans in self.raw_dataset.ans2label:
                     target[self.raw_dataset.ans2label[ans]] = score
-            return ques_id, feats, boxes, ques, target, img_id, img_info
+            return ques_id, feats, boxes, ques, target
         else:
-            return ques_id, feats, boxes, ques, img_id, img_info
+            return ques_id, feats, boxes, ques
 
 
 question_types = ('where', 'what', 'how', 'how many/how much',
