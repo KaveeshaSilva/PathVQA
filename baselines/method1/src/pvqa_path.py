@@ -54,11 +54,11 @@ class PVQA:
         # datasets
 
         self.train_tuple = get_data_tuple(
-            splits=args.train, bs=args.batch_size, shuffle=True, drop_last=True
+            splits='train,val,test', bs=args.batch_size, shuffle=True, drop_last=True
         )
         if args.valid != "":
             self.valid_tuple = get_data_tuple(
-                splits=args.valid, bs=valid_bs,
+                splits='test', bs=valid_bs,
                 shuffle=False, drop_last=False
             )
         else:
@@ -287,9 +287,9 @@ class PVQA:
                     prediction_answers.append(ans)
                     quesid2ans[qid.item()] = ans
 
-                if writeExamples and i == 0:
-                    self.writeIntermediateExamples(
-                        img_id, sent, prediction_answers, target_answers, 3, step)
+                # if writeExamples and i == 0:
+                #     self.writeIntermediateExamples(
+                #         img_id, sent, prediction_answers, target_answers, 3, step)
 
         if dump is not None:
             evaluator.dump_result(quesid2ans, dump)
