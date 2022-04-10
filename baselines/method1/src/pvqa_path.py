@@ -33,7 +33,7 @@ startFrom = 'B'  # M - middle ,   B - beginning
 # default `log_dir` is "runs" - we'll be more specific here
 writer = SummaryWriter(baseUrl+'runs/pvqa_path')
 wandb.init(
-    project="pvqa_path_over1")
+    project="pvqa_path_over2")
 DataTuple = collections.namedtuple("DataTuple", 'dataset loader evaluator')
 valid_bs = 256
 
