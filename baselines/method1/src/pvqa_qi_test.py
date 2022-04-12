@@ -13,8 +13,8 @@ from tqdm import tqdm
 from param import args
 
 from pretrain.qa_answer_table import load_lxmert_qa
-from tasks.pvqa_model_autoencoder import PVQAAutoencoderModel
-from tasks.pvqa_data import PVQADataset, PVQATorchDataset, PVQAEvaluator
+from tasks.pvqa_model_path import PVQAModelPath
+from tasks.pvqa_data_path import PVQADataset, PVQATorchDataset, PVQAEvaluator
 baseUrl = 'drive/MyDrive/PathVQA'
 checkpoint_dir = baseUrl+"/checkpoint_LXRT.pth"
 load_dir = baseUrl+"/checkpoint"
