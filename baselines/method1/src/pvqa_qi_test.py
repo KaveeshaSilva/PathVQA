@@ -15,7 +15,7 @@ from tqdm import tqdm
 
 from param import args
 
-dataset_split = 'test'
+dataset_split = 'train'
 baseUrl = 'drive/MyDrive/PathVQA'
 checkpoint_dir = baseUrl+"/checkpoint_LXRT.pth"
 load_dir = baseUrl+"/checkpoint"
